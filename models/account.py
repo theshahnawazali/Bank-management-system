@@ -6,7 +6,7 @@ class Account:
         self.name = name
         self.type = type
         self.__account_number = account_number    #account number
-        self.__balance = balance  # balance
+        self.__balance = int(balance)  # balance
         print(self.name , self.type)
         new_data = {
             self.__account_number : {
@@ -49,6 +49,8 @@ class Account:
     def withdraw(self,value):
         if value <= self.__balance:
             self.__balance -= value
+
+
 
     
 

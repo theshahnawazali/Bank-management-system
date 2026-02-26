@@ -9,10 +9,16 @@ print("Type login if you have account\nType Signup for creating an new account")
 current_user_username = "User"
 current_user_name = None
 
+# get_account("52761")
+# Deposit("52761",1000)
+# Withdraw("28210",100)
+Withdraw("28210",100)
+Deposit("28210",500)
 
 
 
-while True:
+
+while False:
     user = input(f"{current_user_username}: ").lower()
 
     if user == "signup":
@@ -58,6 +64,11 @@ while True:
         password = input("Enter your Password: ")
         Login(username,password)
         current_user_username = username
+
+    elif user == "account":
+        print("Getting account info....")
+        get_account()
+
         
     elif user == "exit":
         break
