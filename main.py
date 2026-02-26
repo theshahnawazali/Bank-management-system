@@ -4,10 +4,12 @@ from utils import generator
 from models.saving  import saving_account 
 from models.current import Current_account
 
-print("Type login if you have account\n Type Signup for creating an new account")
+print("Type login if you have account\nType Signup for creating an new account")
 
 current_user_username = "User"
 current_user_name = None
+
+
 
 
 while True:
@@ -15,10 +17,7 @@ while True:
 
     if user == "signup":
         name = input("Enter your name: ")
-        username = input("Enter an unique Username: ")
-        while len(username) < 4:
-            print("Username should be minimum 4 charecter")
-            username = input("Enter an unique Username: ")
+        username = generator.check_username()
         password = input("Enter Password: ")
         while len(password) < 8:
             print("Password should be minimum 8 charecter")

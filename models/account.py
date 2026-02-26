@@ -2,12 +2,12 @@ import json
 import os
 
 class Account:
-    def __init__(self,name,type,account_number,balance):   # Name 
+    def __init__(self,type,name,account_number,balance):   # Name 
+        self.name = name
+        self.type = type
         self.__account_number = account_number    #account number
         self.__balance = balance  # balance
-        self.type = type
-        self.name = name
-
+        print(self.name , self.type)
         new_data = {
             self.__account_number : {
                 "Name" : self.name, 

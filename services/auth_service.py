@@ -11,7 +11,7 @@ class User:
         
 
 class Signup(User):
-    def __init__(self,username, password,name):
+    def __init__(self,name,username,password):
         super().__init__(name,username, password)
         self.name = name
         self.username = username
@@ -20,8 +20,8 @@ class Signup(User):
 
         new_data = {
             self.username : {
-                "Name": self.name,
-                "Password": self.password
+                "Name": name,
+                "Password": password
             }
             
         }
