@@ -1,38 +1,70 @@
-import bank
+from services.auth_service import Signup,Login
+from services.bank_service import Create_Account , Deposit, Withdraw, Delete, get_account
+from utils import generator
+from models.saving  import saving_account 
+from models.current import Current_account
 
-c1 = ""
+print("Type login if you have account\n Type Signup for creating an new account")
+
+current_user_username = "User"
+current_user_name = None
+
 
 while True:
-    user = input("User: ").lower()
-    print(user)
+    user = input(f"{current_user_username}: ").lower()
 
-    if user == "exit":
-        print("Exiting....")
-        break
-    elif user == "create account":
-        print("Which type of account you want to open\n Type 1 for Saving Account \n Type 2 for Current Account")
-        acc_type = input("Type 1 or 2: ")
-        if acc_type == "1" or acc_type == "2":
-            name = input("What is your name: ")
-            balance = int(input("Amount deposit: "))
-            if acc_type == "1":
-                bank.saving_acc(name,balance)
-                c1 = bank.saving_acc(name,balance)
+    if user == "signup":
+        name = input("Enter your name: ")
+        username = input("Enter an unique Username: ")
+        while len(username) < 4:
+            print("Username should be minimum 4 charecter")
+            username = input("Enter an unique Username: ")
+        password = input("Enter Password: ")
+        while len(password) < 8:
+            print("Password should be minimum 8 charecter")
+            password = input("Enter Password: ")
+
+        
+        Signup(name,username,password)
+        current_user_username = username
+        current_user_name = name
+        # type = int(input("Which type of account you want to open\n Type 1 for Saving Account \nType 2 fo Current Account"))
+        while True:
+            type = int(input("Which type of account you want to open\n Type 1 for Saving Account \nType 2 fo Current Account"))
+
+            if type == 1 or type == 2:
+                if type == 1:
+                    account_number = generator.generate_acc()
+                    type = "Saving Account"
+                    balance = int(input("Enter an minimum amount: "))
+                    while balance < 0:
+                        print("Amount Should be in Positive")
+                        balance = int(input("Enter an minimum amount: "))
+                    saving_account(current_user_name,type,account_number,balance)
+                else:
+                    account_number = generator.generate_acc()
+                    type = "Current Account"
+                    balance = int(input("Enter an minimum amount: "))
+                    while balance < 0:
+                        print("Amount Should be in Positive")
+                        balance = int(input("Enter an minimum amount: "))
+                    Current_account(current_user_name,type,account_number,balance)
+
+                break
             else:
-                bank.current_acc(name,balance)
-                c1 = bank.current_acc(name,balance)
-        else:
-            print("Invalid Input")
-    elif user == "balance":
-        if c1 == "":
-            print("User not found.Create an account.")
-        else:
-            bank.check_balance(c1)
-    elif user == "withdraw":
-        value = int(input("How much money you want to withdraw: "))
-        bank.withdraw(c1,value)
-    elif user == "deposit":
-        bank.deposit(c1,value)
-        value = int(input("How much money you want to deposit: "))
+                print("Invalid Output.")
+    
+    elif user == "login":
+        username = input("Enter Your Username: ")
+        password = input("Enter your Password: ")
+        Login(username,password)
+        current_user_username = username
+        
+    elif user == "exit":
+        break
+
     else:
-        print("Invalid Input")
+        print("Invalid Input.")
+
+
+    
