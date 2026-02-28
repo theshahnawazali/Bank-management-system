@@ -4,7 +4,7 @@ from utils import generator
 from models.saving  import saving_account 
 from models.current import Current_account
 
-print("Type login if you have account\nType Signup for creating an new account")
+print("Type login if you have account\nType Signup for creating an new account\n Type Account to get all information about your account\nType withdraw for withdrawing amount\nType deposit to deposit amount\nType transaction for all transections history\nType exit to end the program.")
 
 
 current_user_username = "User"
