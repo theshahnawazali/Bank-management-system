@@ -1,6 +1,8 @@
 import os
 import json
 from models.account import Account
+from models.transaction import Transaction
+
 
 # create account
 
@@ -34,39 +36,39 @@ class Create_Account:
             json.dump(data, f, indent=4)
 
 
-# get acc
-# class get_account(Account):
-#     def get_account(self):
-#         return super().get_account()
+
+
 
 class get_account:
-    def __init__(self,account_number):
-        self.account_number = account_number
+    def __init__(self,username):
+        self.username = username
 
-        if os.path.exists("data/account.json"):
-            with open("data/account.json","r") as f:
+        if os.path.exists("data/user.json"):
+            with open("data/user.json","r") as f:
                 data = json.load(f)
+
                 for user in data:
-                    if self.account_number in user:
-                        print(f"Name: {user[self.account_number]["Name"]}")
-                        print(f"Account Number: {self.account_number}")
-                        print(f"Balance: {user[self.account_number]["Balance"]}")
-                        print(f"Account Type: {user[self.account_number]["Account Type"]}")
-                    else:
-                        print("Not Found")
+                    if self.username in user:
+                        if os.path.exists("data/account.json"):
+                            with open("data/account.json","r") as a:
+
+                                account_data = json.load(a)
+
+                                for account in account_data:
+                                    if self.username in account:
+                                        print(f"Name: {account[self.username]["Name"]}")
+                                        print(f"Account Number: {account[self.username]["Account Number"]}")
+                                        print(f"Balance: {account[self.username]["Balance"]}")
+                                        print(f"Account Type: {account[self.username]["Account Type"]}")
 
 
 
-# deposit
-# class Deposit(Account):
-#     def deposit(self, value):
-#         return super().deposit(value)
-                         
 class Withdraw:
-    def __init__(self,account_number,value):
-        self.account_number = account_number
+    def __init__(self,account_username,value):
+        self.account_username = account_username
         self.value = value
         self.withdraw()
+        
         
 
     def withdraw(self):
@@ -77,27 +79,30 @@ class Withdraw:
             with open("data/account.json", "r") as f:
                 data = json.load(f)
 
-            if self.account_number not in data:
-                print("Account not found")
-                return
+            for user in data:
+                if self.account_username in user:
+                    print('Find')
+                    Account_no = user[self.account_username]["Account Number"]
+                    balance = user[self.account_username]["Balance"]
+                    print(balance)
+                    if balance >= self.value:
+                        balance -= self.value
+                        user[self.account_username]["Balance"] = balance
 
-            balance = data[self.account_number]["Balance"]
+                        with open("data/account.json", "w") as f:
+                            json.dump(data, f, indent=4)
 
-            if balance >= self.value:
-                balance -= self.value
-                data[self.account_number]["Balance"] = balance
+                        print("Withdraw successful")
+                        print("New Balance:", balance)
+                        Transaction(self.account_username,"Debited",self.value,balance)
+                    else:
+                        print("Insufficient Amount") 
 
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
 
-                print("Withdraw successful")
-                print("New Balance:", balance)
-            else:
-                print("Insufficient Amount")  
         
 class Deposit:
-    def __init__(self,account_number,value):
-        self.account_number = account_number
+    def __init__(self,account_username,value):
+        self.account_username = account_username
         self.value = value
         self.deposit()
         
@@ -110,36 +115,51 @@ class Deposit:
             with open("data/account.json", "r") as f:
                 data = json.load(f)
 
-            if self.account_number not in data:
-                print("Account not found")
-                return
+            for user in data:
+                if self.account_username in user:
+                    balance = user[self.account_username]["Balance"]
+                    print(balance)
+                    if balance > 0:
+                        balance += self.value
+                        user[self.account_username]["Balance"] = balance
 
-            balance = data[self.account_number]["Balance"]
+                        with open("data/account.json", "w") as f:
+                            json.dump(data, f, indent=4)
 
-            if balance > 0:
-                balance += self.value
-                data[self.account_number]["Balance"] = balance
-
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
-
-                print("Withdraw successful")
-                print("New Balance:", balance)
-            else:
-                print("Insufficient Amount")  
+                        print("Withdraw successful")
+                        print("New Balance:", balance)
+                        Transaction(self.account_username,"Debited",self.value,balance)
+                    else:
+                        print("Insufficient Amount")  
 
  
+class Transactions:
+    def __init__(self,username):
+        self.account_username = username
+        self.transaction()
+
+    def transaction(self):
+        if not os.path.exists("data/account.json"):
+                print("Account file not found")
+                return
+
+        with open("data/account.json", "r") as f:
+            data = json.load(f)
+
+        for user in data:
+            if self.account_username in user:
+                for trans in user[self.account_username]["Transaction"]:
+                    print(trans)
+            
+
+        
+
+
 
 # delete account
 class Delete(Account):
     pass
 
-
-
-# # withdraw
-# class Withdraw(Account):
-#     def withdraw(self, value):
-#         return super().withdraw(value)
 
 
 

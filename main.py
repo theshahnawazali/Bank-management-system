@@ -1,24 +1,17 @@
 from services.auth_service import Signup,Login
-from services.bank_service import Create_Account , Deposit, Withdraw, Delete, get_account
+from services.bank_service import Deposit, Withdraw, get_account, Transactions
 from utils import generator
 from models.saving  import saving_account 
 from models.current import Current_account
 
 print("Type login if you have account\nType Signup for creating an new account")
 
+
 current_user_username = "User"
 current_user_name = None
 
-# get_account("52761")
-# Deposit("52761",1000)
-# Withdraw("28210",100)
-Withdraw("28210",100)
-Deposit("28210",500)
-
-
-
-
-while False:
+while True:
+    
     user = input(f"{current_user_username}: ").lower()
 
     if user == "signup":
@@ -45,7 +38,8 @@ while False:
                     while balance < 0:
                         print("Amount Should be in Positive")
                         balance = int(input("Enter an minimum amount: "))
-                    saving_account(current_user_name,type,account_number,balance)
+                    saving_account(current_user_name,type,account_number,balance,current_user_username)
+                    current_user_acc_no = account_number
                 else:
                     account_number = generator.generate_acc()
                     type = "Current Account"
@@ -53,7 +47,8 @@ while False:
                     while balance < 0:
                         print("Amount Should be in Positive")
                         balance = int(input("Enter an minimum amount: "))
-                    Current_account(current_user_name,type,account_number,balance)
+                    Current_account(current_user_name,type,account_number,balance,current_user_username)
+                    current_user_acc_no = account_number
 
                 break
             else:
@@ -64,13 +59,32 @@ while False:
         password = input("Enter your Password: ")
         Login(username,password)
         current_user_username = username
+        
+    
 
     elif user == "account":
-        print("Getting account info....")
-        get_account()
+        if not current_user_username == "User":
+            print("Getting account info....")
+            get_account(current_user_username)
+        else:
+            print("Login First")
+
+    elif user == "withdraw" or user == "deposit" or user == "transaction":
+        if not current_user_username == "User":
+            value = int(input("Enter amount: "))
+            if user == "withdraw":
+                Withdraw(current_user_username,value)
+            elif user == "deposit":
+                Deposit(current_user_username,value)
+            else:
+                Transactions(current_user_username)
+        else:
+            print("Login First")
 
         
     elif user == "exit":
+        current_user_username == "User"
+        current_user_name = None
         break
 
     else:

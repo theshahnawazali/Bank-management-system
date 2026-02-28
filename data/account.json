@@ -1,8 +1,53 @@
-{
-    "28210": {
-        "Name": "zee",
-        "Balance": 1300,
-        "Account Type": "Current Account",
-        "Transaction": []
+[
+    {
+        "shahnawaz": {
+            "Name": "Shahnawaz Ali",
+            "Balance": 100000,
+            "Account Number": 45825,
+            "Account Type": "Current Account",
+            "Transaction": [
+                "28-02-2026 15:19:30 ---> Debited amount is 100000 Total 109000",
+                "28-02-2026 15:19:46 ---> Debited amount is 9000 Total 100000"
+            ]
+        }
+    },
+    {
+        "ali07": {
+            "Name": "Ali",
+            "Balance": 90100,
+            "username": "ali07",
+            "Account Number": 27035,
+            "Account Type": "Saving Account",
+            "Transaction": [
+                "28-02-2026 15:12:30 ---> Debited amount is 100 Total 5000",
+                "28-02-2026 15:13:36 ---> Debited amount is 100 Total 190100",
+                "28-02-2026 15:13:36 ---> Debited amount is 50000 Total 240100",
+                "28-02-2026 15:13:57 ---> Debited amount is 100000 Total 140100",
+                "28-02-2026 15:13:57 ---> Debited amount is 50000 Total 190100",
+                "28-02-2026 15:14:03 ---> Debited amount is 100000 Total 90100",
+                "28-02-2026 15:14:03 ---> Debited amount is 50000 Total 140100",
+                "28-02-2026 15:14:05 ---> Debited amount is 100000 Total 40100",
+                "28-02-2026 15:14:05 ---> Debited amount is 50000 Total 90100",
+                "28-02-2026 15:14:07 ---> Debited amount is 50000 Total 140100",
+                "28-02-2026 15:14:08 ---> Debited amount is 100000 Total 40100",
+                "28-02-2026 15:14:08 ---> Debited amount is 50000 Total 90100",
+                "28-02-2026 15:14:09 ---> Debited amount is 50000 Total 140100",
+                "28-02-2026 15:14:10 ---> Debited amount is 100000 Total 40100",
+                "28-02-2026 15:14:10 ---> Debited amount is 50000 Total 90100",
+                "28-02-2026 15:14:12 ---> Debited amount is 50000 Total 140100",
+                "28-02-2026 15:14:24 ---> Debited amount is 50000 Total 190100",
+                "28-02-2026 15:14:32 ---> Debited amount is 100000 Total 90100"
+            ]
+        }
+    },
+    {
+        "shahnawazali07": {
+            "Name": "Shahnawaz",
+            "Balance": 1000,
+            "username": "shahnawazali07",
+            "Account Number": 81009,
+            "Account Type": "Saving Account",
+            "Transaction": []
+        }
     }
-}
+]
