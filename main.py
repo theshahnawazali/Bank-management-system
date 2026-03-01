@@ -3,6 +3,7 @@ from services.bank_service import Deposit, Withdraw, get_account, Transactions
 from utils import generator
 from models.saving import saving_account 
 from models.current import Current_account
+from utils import validator
 
 
 # Display available commands menu
@@ -29,16 +30,25 @@ while True:
 
     # ---------------- USER REGISTRATION ----------------
     if user == "signup":
-        name = input("Enter your name: ")
 
-        # Generate unique username
+        # -------- NAME VALIDATION --------
+        while True:
+            try:
+                name = input("Enter your name: ")
+                validator.validate_name(name)
+                break
+            except ValueError as e:
+                print(e)
+
         username = generator.check_username()
 
-        # Take password with minimum length validation
-        password = input("Enter Password: ")
-        while len(password) < 8:
-            print("Password should be minimum 8 character")
-            password = input("Enter Password: ")
+        while True:
+            try:
+                password = input("Enter your password: ")
+                validator.validate_password(password)
+                break
+            except ValueError as e:
+                print(e)
 
         # Create new user account
         Signup(name, username, password)
@@ -47,80 +57,75 @@ while True:
         current_user_username = username
         current_user_name = name
 
-
-        # -------- ACCOUNT TYPE SELECTION --------
         while True:
-            type = int(input(
-                "Which type of account you want to open\n"
-                "Type 1 for Saving Account\n"
-                "Type 2 for Current Account"
-            ))
+            try:
+                # -------- ACCOUNT TYPE SELECTION --------
+                acc_type = int(input(
+                    "1 Saving Account\n"
+                    "2 Current Account\nChoose: "
+                ))
 
-            # Validate account type input
-            if type == 1 or type == 2:
+                if acc_type not in [1, 2]:
+                    print("Invalid choice")
+                    continue
 
-                # -------- SAVING ACCOUNT --------
-                if type == 1:
-                    account_number = generator.generate_acc()
-                    type = "Saving Account"
+                account_number = generator.generate_acc()
 
-                    # Minimum deposit validation
-                    balance = int(input("Enter a minimum amount: "))
-                    while balance < 0:
-                        print("Amount should be positive")
-                        balance = int(input("Enter a minimum amount: "))
+                balance = int(input("Enter initial amount: "))
+                validator.validate_initial_balance(balance)
 
-                    # Create saving account
-                    saving_account(current_user_name, type, account_number, balance, current_user_username)
-                    current_user_acc_no = account_number
-
-                # -------- CURRENT ACCOUNT --------
+                if acc_type == 1:
+                    saving_account(name, "Saving Account", account_number, balance, username)
                 else:
-                    account_number = generator.generate_acc()
-                    type = "Current Account"
+                    Current_account(name, "Current Account", account_number, balance, username)
 
-                    balance = int(input("Enter a minimum amount: "))
-                    while balance < 0:
-                        print("Amount should be positive")
-                        balance = int(input("Enter a minimum amount: "))
+                print("Account Created Successfully")
+                break
+            except ValueError as e:
+                print(e)
+                
+    elif user == "login":
+        # ---------------- USER LOGIN ----------------
+        while True:
+            try:
+                username = input("Enter Your Username: ")
+                validator.validate_username(username)
 
-                    # Create current account
-                    Current_account(current_user_name, type, account_number, balance, current_user_username)
-                    current_user_acc_no = account_number
+                password = input("Enter your Password: ")
+                validator.validate_password(password)
+                
+                # Authenticate user credentials
+                Login(username, password)
 
                 break
-            else:
-                print("Invalid Output.")
 
+            except ValueError as e:
+                print(e)
+            
+            # Update session username
+            current_user_username = username
 
-    # ---------------- USER LOGIN ----------------
-    elif user == "login":
-        username = input("Enter Your Username: ")
-        password = input("Enter your Password: ")
-
-        # Authenticate user credentials
-        Login(username, password)
-
-        # Update session username
-        current_user_username = username
+        
         
 
     # ---------------- ACCOUNT INFO ----------------
     elif user == "account":
 
         # Ensure user is logged in before fetching details
-        if not current_user_username == "User":
-            print("Getting account info....")
+        try:
+            validator.validate_user_logged_in(current_user_username)
             get_account(current_user_username)
-        else:
-            print("Login First")
+
+        except PermissionError as e:
+            print(e)
 
 
     # ---------------- TRANSACTIONS ----------------
-    elif user == "withdraw" or user == "deposit" or user == "transaction":
+    elif user == "withdraw" or user == "deposit":
 
         # Require login before transaction operations
-        if not current_user_username == "User":
+        try:
+            validator.validate_user_logged_in(current_user_username)
 
             # Get transaction amount
             value = int(input("Enter amount: "))
@@ -130,15 +135,23 @@ while True:
                 Withdraw(current_user_username, value)
 
             # Deposit funds
-            elif user == "deposit":
-                Deposit(current_user_username, value)
-
-            # Show transaction history
             else:
-                Transactions(current_user_username)
+                Deposit(current_user_username, value)
+        
+        except PermissionError as e:
+            print(e)
+    
+    # ---------------- TRANSACTIONS ----------------
+    elif user == "transaction":
 
-        else:
-            print("Login First")
+        # Show transaction history
+        try:
+            validator.validate_user_logged_in(current_user_username)
+            Transactions(current_user_username)
+
+        except PermissionError as e:
+            print(e)
+
 
 
     # ---------------- EXIT PROGRAM ----------------
