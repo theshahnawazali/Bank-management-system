@@ -1,9 +1,8 @@
-# acc no  Generator
-# unique identify
-
 import random
 import json
 import os
+
+# Generate a unique account number and verify it is unique
 
 def generate_acc():
     a = random.randint(10000,99999)
@@ -22,6 +21,7 @@ def generate_acc():
 
     return a
 
+# Ensure the username is unique
 def check_username():
     username = input("Enter an unique Username: ").lower()
     while len(username) < 4:
