@@ -1,6 +1,7 @@
 # Import required modules
 import os
 import json
+from utils import file_handler
 
 # Import account creation service (if needed after signup)
 from services.bank_service import Create_Account
@@ -34,38 +35,7 @@ class Signup(User):
         self.username = username
         self.password = password
 
-        # Structure new user data
-        new_data = {
-            self.username: {
-                "Name": name,
-                "Password": password
-            }
-        }
-
-        file_path = "data/user.json"
-
-        # Load existing user data if file exists
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                try:
-                    data = json.load(f)
-                except:
-                    # Handle empty or corrupted JSON file
-                    data = []
-        else:
-            # Initialize empty list if file does not exist
-            data = []
-
-        # Ensure data format is always a list
-        if isinstance(data, dict):
-            data = [data]
-
-        # Append new user record
-        data.append(new_data)
-
-        # Save updated user data back to file
-        with open("data/user.json", "w") as f:
-            json.dump(data, f, indent=4)
+        file_handler.signup_handle(self.username,self.name,self.password)
 
 
 # ---------------- LOGIN CLASS ----------------
@@ -82,30 +52,5 @@ class Login(User):
         self.username = username
         self.password = password
 
-        file_path = "data/user.json"
-        found = False  # Track if user exists
-
-        # Check if user data file exists
-        if os.path.exists(file_path):
-            with open(file_path, "r") as f:
-                try:
-                    data = json.load(f)
-
-                    # Iterate through stored users
-                    for user in data:
-                        if username in user:
-                            found = True
-
-                            # Validate password
-                            if user[username]["Password"] == password:
-                                print("Log in successful")
-                            else:
-                                print("Wrong Password")
-
-                    # If username not found in file
-                    if not found:
-                        print("User Not Found")
-
-                except json.JSONDecodeError:
-                    # Handle invalid JSON format
-                    print("Invalid Json Format")
+        file_handler.login_handle(self.username,self.password)
+        

@@ -28,12 +28,6 @@ def check_username():
     while len(username) < 4:
         print("Username should be minimum 4 charecter")
         username = input("Enter an unique Username: ").lower()
-    # check_unique = validator.validate_username(username)
-
-    # if check_unique == True:
-    #     print("Yes username is unique.")
-    # else:
-    #     print("False")
 
 
     if os.path.exists("data/user.json"):
