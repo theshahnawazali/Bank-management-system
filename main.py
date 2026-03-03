@@ -3,7 +3,7 @@ from services.bank_service import Deposit, Withdraw, get_account, Transactions
 from utils import generator
 from models.saving import saving_account 
 from models.current import Current_account
-from utils import validator
+from utils import validator , hash
 
 
 # Display available commands menu
@@ -46,12 +46,15 @@ while True:
             try:
                 password = input("Enter your password: ")
                 validator.validate_password(password)
+
+                secured_password = hash.secure_password(password)
+
                 break
             except ValueError as e:
                 print(e)
 
         # Create new user account
-        Signup(name, username, password)
+        Signup(name, username, secured_password)
 
         # Set session user info
         current_user_username = username
@@ -94,16 +97,20 @@ while True:
                 password = input("Enter your Password: ")
                 validator.validate_password(password)
                 
+                secured_password = hash.secure_password(password)
+
                 # Authenticate user credentials
-                Login(username, password)
+                Login(username, secured_password)
+
+                # Update session username
+                current_user_username = username
 
                 break
 
             except ValueError as e:
                 print(e)
             
-            # Update session username
-            current_user_username = username
+            
 
         
         

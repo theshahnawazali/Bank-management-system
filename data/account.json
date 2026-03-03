@@ -1,13 +1,14 @@
 [
     {
-        "shahnawaz": {
-            "Name": "Shahnawaz Ali",
-            "Balance": 100000,
-            "Account Number": 45825,
-            "Account Type": "Current Account",
+        "user": {
+            "Name": "USER",
+            "Balance": 5000,
+            "username": "user",
+            "Account Number": 74334,
+            "Account Type": "Saving Account",
             "Transaction": [
-                "28-02-2026 15:19:30 ---> Debited amount is 100000 Total 109000",
-                "28-02-2026 15:19:46 ---> Debited amount is 9000 Total 100000"
+                "03-03-2026 16:45:03 ---> Debited | Amount: 500 | Balance: 500",
+                "03-03-2026 16:45:19 ---> Credited | Amount: 4500 | Balance: 5000"
             ]
         }
     }
