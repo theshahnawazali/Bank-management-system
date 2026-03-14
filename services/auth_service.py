@@ -1,6 +1,4 @@
 # Import required modules
-import os
-import json
 from utils import file_handler
 
 # Import account creation service (if needed after signup)

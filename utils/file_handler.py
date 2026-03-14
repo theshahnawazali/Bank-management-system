@@ -118,42 +118,47 @@ def get_account_handle(username):
                 # Find matching user
                 for user in data:
                     if username in user:
+                        acc_no = str(user[username]["Account Number"])
 
-                        # Open account file
-                        if os.path.exists("data/account.json"):
-                            with open("data/account.json", "r") as a:
-                                account_data = json.load(a)
-
-                                # Search for user's account
-                                for account in account_data:
-                                    if username in account:
-                                        print(f"Name: {account[username]['Name']}")
-                                        print(f"Account Number: {account[username]['Account Number']}")
-                                        print(f"Balance: {account[username]['Balance']}")
-                                        print(f"Account Type: {account[username]['Account Type']}")
+            
+        if os.path.exists("data/account.json"):
+            with open("data/account.json", "r") as f:
+                data = json.load(f)
+            
+            for user in data:
+                if acc_no in user:
+                    print(f"Name: {user[acc_no]['Name']}")
+                    print(f"Balance: {user[acc_no]['Balance']}")
+                    print(f"Account Type: {user[acc_no]['Account Type']}")
+                    print(f"Account Number: {acc_no}")                  
 
 
 # --------------- Withdraw Handler ----------------
-def withdraw_handle(account_username,value):
-    # Ensure account file exists
-    if not os.path.exists("data/account.json"):
-        print("Account file not found")
-        return
+def withdraw_handle(username,value):
+    # Check if user file exists
+    if os.path.exists("data/user.json"):
+        with open("data/user.json", "r") as f:
+            data = json.load(f)
 
-    # Load account data
-    with open("data/account.json", "r") as f:
-        data = json.load(f)
+            # Find matching user
+            for user in data:
+                if username in user:
+                    acc_no = str(user[username]["Account Number"])
+
+        
+    if os.path.exists("data/account.json"):
+        with open("data/account.json", "r") as f:
+            data = json.load(f)
 
     # Search for user account
     for user in data:
-        if account_username in user:
-
-            balance = user[account_username]["Balance"]
+        if acc_no in user:
+            balance = user[acc_no]["Balance"]
 
             # Check sufficient balance
             if balance >= value:
                 balance -= value
-                user[account_username]["Balance"] = balance
+                user[acc_no]["Balance"] = balance
 
                 # Save updated balance
                 with open("data/account.json", "w") as f:
@@ -163,31 +168,39 @@ def withdraw_handle(account_username,value):
                 print("New Balance:", balance)
 
                 # Record transaction log
-                Transaction(account_username, "Debited", value, balance)
+                Transaction(acc_no, "Debited", value, balance)
 
             else:
                 print("Insufficient Amount")
 
 
 # --------------- Deposit Handler ----------------
-def deposit_handle(account_username,value):
-    # Ensure account file exists
-        if not os.path.exists("data/account.json"):
-            print("Account file not found")
-            return
+def deposit_handle(username,value):
+    # Check if user file exists
+    if os.path.exists("data/user.json"):
+        with open("data/user.json", "r") as f:
+            data = json.load(f)
 
-        # Load account data
+            # Find matching user
+            for user in data:
+                if username in user:
+                    acc_no = str(user[username]["Account Number"])
+
+        
+    if os.path.exists("data/account.json"):
         with open("data/account.json", "r") as f:
             data = json.load(f)
 
-        # Find user account
-        for user in data:
-            if account_username in user:
-                balance = user[account_username]["Balance"]
+    # Search for user account
+    for user in data:
+        if acc_no in user:
+            balance = user[acc_no]["Balance"]
 
+            # Check sufficient balance
+            if balance > 0:
                 # Add deposit amount
                 balance += value
-                user[account_username]["Balance"] = balance
+                user[acc_no]["Balance"] = balance
 
                 # Save updated balance
                 with open("data/account.json", "w") as f:
@@ -197,22 +210,47 @@ def deposit_handle(account_username,value):
                 print("New Balance:", balance)
 
                 # Record transaction
-                Transaction(account_username, "Credited", value, balance)
+                Transaction(acc_no, "Credited", value, balance)
 
 
 # --------------- Transaction Handler ----------------
-def transaction_handler(account_username):
-    # Ensure account file exists
-        if not os.path.exists("data/account.json"):
-            print("Account file not found")
-            return
+def transaction_handler(username):
+    # Check if user file exists
+    if os.path.exists("data/user.json"):
+        with open("data/user.json", "r") as f:
+            data = json.load(f)
 
-        # Load account data
+            # Find matching user
+            for user in data:
+                if username in user:
+                    acc_no = str(user[username]["Account Number"])
+
+        
+    if os.path.exists("data/account.json"):
         with open("data/account.json", "r") as f:
             data = json.load(f)
 
         # Print transaction list
         for user in data:
-            if account_username in user:
-                for trans in user[account_username]["Transaction"]:
+            if acc_no in user:
+                for trans in user[acc_no]["Transaction"]:
                     print(trans)
+
+# --------------- Set Account Number ----------------
+def set_account_number(username,account_number):
+    if not os.path.exists("data/user.json"):
+        print("User Path not found.")
+        return
+    
+    with open("data/user.json","r") as f:
+        try:
+            data = json.load(f)
+        except:
+            data = []
+
+    for users in data:
+        if username in users:
+            users[username]["Account Number"] =  account_number
+
+    with open("data/user.json", "w") as f:
+            json.dump(data, f, indent=4)

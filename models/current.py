@@ -1,5 +1,6 @@
 # Import base Account class
 from models.account import Account
+from utils.file_handler import set_account_number
 
 
 # =========================================================
@@ -10,13 +11,10 @@ class Current_account(Account):
     """
     Create a Current Account instance.
 
-    Parameters:
-        name        : Account holder name
-        type        : Account type (Current Account)
-        account_no  : Unique account number
-        balance     : Initial account balance
-        username    : Owner username
+    Account Number:
+        {}
     """
+
 
     def __init__(self, name, type, account_no, balance, username):
 
@@ -28,6 +26,8 @@ class Current_account(Account):
         self.name = name
         self.account_number = account_no
         self.username = username
+
+        set_account_number(self.username,self.account_number)
 
         # Confirmation message
         print("Your Current Account is Open..")

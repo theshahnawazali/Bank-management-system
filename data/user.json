@@ -1,8 +1,16 @@
 [
     {
-        "user": {
-            "Name": "USER",
-            "Password": "dcb694aa0322f143ed970e275c807bf123bd5db4f73140b94ccc757f42dc8043"
+        "user1": {
+            "Name": "user1",
+            "Password": "dcb694aa0322f143ed970e275c807bf123bd5db4f73140b94ccc757f42dc8043",
+            "Account Number": 40215
+        }
+    },
+    {
+        "user2": {
+            "Name": "user2",
+            "Password": "dcb694aa0322f143ed970e275c807bf123bd5db4f73140b94ccc757f42dc8043",
+            "Account Number": 72730
         }
     }
 ]

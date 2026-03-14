@@ -1,6 +1,6 @@
 # Import base Account class
 from models.account import Account
-
+from utils.file_handler import set_account_number
 
 # =========================================================
 # SAVING ACCOUNT CLASS
@@ -10,12 +10,8 @@ class saving_account(Account):
     """
     Create a Saving Account instance.
 
-    Parameters:
-        name        : Account holder name
-        type        : Account type (Saving Account)
-        account_no  : Unique account number
-        balance     : Initial account balance
-        username    : Owner username
+    Account Number:
+        {}
     """
 
     def __init__(self, name, type, account_no, balance, username):
@@ -24,10 +20,13 @@ class saving_account(Account):
         super().__init__(type, name, account_no, balance, username)
 
         # Store account details locally
+        self.__balance = balance
         self.type = type
         self.name = name
         self.account_number = account_no
         self.username = username
-
+        
+        set_account_number(self.username,self.account_number)
+        
         # Confirmation message
         print("Your Saving Account is Open..")

@@ -11,10 +11,9 @@ class Account:
     """
     Base Account model.
 
-    Parameters:
+    Account Number:
         type            : Account type (Saving / Current)
         name            : Account holder name
-        account_number  : Unique account number
         balance         : Initial account balance
         username        : Account owner username
     """
@@ -24,7 +23,7 @@ class Account:
         # Store account details
         self.name = name
         self.type = type
-        self.__account_number = account_number   # Private account number
+        self.__account_number = int(account_number)   # Private account number
         self.__balance = int(balance)            # Private balance
         self.username = username
 
@@ -32,11 +31,10 @@ class Account:
 
         # Structure account data for storage
         new_data = {
-            self.username: {
+            self.__account_number: {
                 "Name": self.name,
                 "Balance": self.__balance,
                 "username": self.username,
-                "Account Number": self.__account_number,
                 "Account Type": self.type,
                 "Transaction": []
             }

@@ -1,14 +1,25 @@
 [
     {
-        "user": {
-            "Name": "USER",
-            "Balance": 5000,
-            "username": "user",
-            "Account Number": 74334,
+        "40215": {
+            "Name": "user1",
+            "Balance": 10500,
+            "username": "user1",
             "Account Type": "Saving Account",
             "Transaction": [
-                "03-03-2026 16:45:03 ---> Debited | Amount: 500 | Balance: 500",
-                "03-03-2026 16:45:19 ---> Credited | Amount: 4500 | Balance: 5000"
+                "14-03-2026 10:16:23 ---> Debited | Amount: 500 | Balance: 500",
+                "14-03-2026 10:16:33 ---> Credited | Amount: 10000 | Balance: 10500"
+            ]
+        }
+    },
+    {
+        "72730": {
+            "Name": "user2",
+            "Balance": 405000,
+            "username": "user2",
+            "Account Type": "Current Account",
+            "Transaction": [
+                "14-03-2026 10:17:17 ---> Debited | Amount: 5000 | Balance: 5000",
+                "14-03-2026 10:17:25 ---> Credited | Amount: 400000 | Balance: 405000"
             ]
         }
     }

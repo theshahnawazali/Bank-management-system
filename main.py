@@ -3,9 +3,9 @@ from services.bank_service import Deposit, Withdraw, get_account, Transactions
 from utils import generator
 from models.saving import saving_account 
 from models.current import Current_account
-from utils import validator , hash
+from utils import validator , hash, file_handler
 
-
+# file_handler.transaction_handler("shahnawaz")
 # Display available commands menu
 print("Type login if you have account\n"
       "Type Signup for creating an new account\n"
