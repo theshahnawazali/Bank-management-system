@@ -1,11 +1,10 @@
 from services.auth_service import Signup, Login
-from services.bank_service import Deposit, Withdraw, get_account, Transactions
+from services.bank_service import Deposit, Withdraw, get_account, Transactions,Transfer
 from utils import generator
 from models.saving import saving_account 
 from models.current import Current_account
 from utils import validator , hash, file_handler
 
-# file_handler.transaction_handler("shahnawaz")
 # Display available commands menu
 print("Type login if you have account\n"
       "Type Signup for creating an new account\n"
@@ -19,6 +18,7 @@ print("Type login if you have account\n"
 # Track currently logged-in user
 current_user_username = "User"
 current_user_name = None
+
 
 
 # Main program loop
@@ -159,8 +159,16 @@ while True:
         except PermissionError as e:
             print(e)
 
+    # ---------------- Transfer Amount ----------------
+    elif user == "transfer":
+        try:
+            validator.validate_user_logged_in(current_user_username)
+            user_account_number = input("Enter Account Number: ")
+            value = int(input("Enter Amount: "))
+            Transfer(current_user_username,value,user_account_number)
 
-
+        except PermissionError as e:
+            print(e)
     # ---------------- EXIT PROGRAM ----------------
     elif user == "exit":
         current_user_username == "User"

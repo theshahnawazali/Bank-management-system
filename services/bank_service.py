@@ -106,19 +106,14 @@ class Delete(Account):
 # TRANSFER MONEY
 # =========================================================
 class Transfer:
-    def __init__(self,account_number,value):
-        self.account_number = account_number
+    def __init__(self,username,value,account_number):
+        self.username =username
         self.value = value
+        self.account_number = account_number
+        self.transfer()
 
-        if not os.path.exists("data/account.json"):
-            print("Account file not found")
-            return
-        
-        with open("data/account.json", "r") as f:
-            data = json.load(f)
-
-        # for user in data:
-        #     if 
+    def transfer(self):
+            file_handler.transfer_handle(self.username,self.value,self.account_number)
         
 
 

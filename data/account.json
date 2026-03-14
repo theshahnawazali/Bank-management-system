@@ -2,24 +2,32 @@
     {
         "40215": {
             "Name": "user1",
-            "Balance": 10500,
+            "Balance": 805000,
             "username": "user1",
             "Account Type": "Saving Account",
             "Transaction": [
                 "14-03-2026 10:16:23 ---> Debited | Amount: 500 | Balance: 500",
-                "14-03-2026 10:16:33 ---> Credited | Amount: 10000 | Balance: 10500"
+                "14-03-2026 10:16:33 ---> Credited | Amount: 10000 | Balance: 10500",
+                "14-03-2026 13:11:36 ---> Transfered to 72730 | Amount: 1000 | Balance: 827000",
+                "14-03-2026 13:12:37 ---> Transfered to 72730 | Amount: 1000 | Balance: 826000",
+                "14-03-2026 13:13:09 ---> Transfered to 72730 | Amount: 1000 | Balance: 825000",
+                "14-03-2026 13:19:11 ---> Transfered to 1000000 | Amount: 10000 | Balance: 815000",
+                "14-03-2026 13:20:29 ---> Transfered to 72730 | Amount: 10000 | Balance: 805000"
             ]
         }
     },
     {
         "72730": {
             "Name": "user2",
-            "Balance": 405000,
+            "Balance": 431000,
             "username": "user2",
             "Account Type": "Current Account",
             "Transaction": [
                 "14-03-2026 10:17:17 ---> Debited | Amount: 5000 | Balance: 5000",
-                "14-03-2026 10:17:25 ---> Credited | Amount: 400000 | Balance: 405000"
+                "14-03-2026 10:17:25 ---> Credited | Amount: 400000 | Balance: 405000",
+                "14-03-2026 13:12:37 ---> Credited from 40215 | Amount: 1000 | Balance: 420000",
+                "14-03-2026 13:13:09 ---> Credited from 40215 | Amount: 1000 | Balance: 421000",
+                "14-03-2026 13:20:29 ---> Credited from 40215 | Amount: 10000 | Balance: 431000"
             ]
         }
     }

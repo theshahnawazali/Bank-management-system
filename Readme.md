@@ -19,6 +19,8 @@ The system is designed using a **modular layered architecture**, separating auth
 * Transaction history logs
 * Deposit & Withdraw functionality
 * Balance checking
+* Password hashing
+* Transfer Amount from one user to second user
 * JSON-based persistent storage
 * Modular folder structure
 * Clean OOP architecture
@@ -110,7 +112,6 @@ Through this project I learned how to:
 
 Planned enhancements:
 
-* Password hashing
 * SQLite database integration
 * REST API version
 * GUI interface

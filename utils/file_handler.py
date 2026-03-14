@@ -254,3 +254,62 @@ def set_account_number(username,account_number):
 
     with open("data/user.json", "w") as f:
             json.dump(data, f, indent=4)
+
+# --------------- Transfer Handler ----------------
+def transfer_handle(username,value,account_number):
+    # Check if user file exists
+    if os.path.exists("data/user.json"):
+        with open("data/user.json", "r") as f:
+            data = json.load(f)
+
+            # Find matching user
+            for user in data:
+                if username in user:
+                    acc_no = str(user[username]["Account Number"])
+
+        
+    if os.path.exists("data/account.json"):
+        with open("data/account.json", "r") as f:
+            data = json.load(f)
+
+    # Search for user account
+    for user in data:
+        if acc_no in user:
+            print(user[acc_no]["Balance"])
+            balance = user[acc_no]["Balance"]
+            # Check sufficient balance
+            if balance >= value:
+                balance -= value
+                user[acc_no]["Balance"] = balance
+
+                # Save updated balance
+                with open("data/account.json", "w") as f:
+                    json.dump(data, f, indent=4)
+
+                Transaction(acc_no,f"Transfered to {account_number}", value,balance)
+                
+    if not os.path.exists("data/account.json"):
+        print("Account file not found")
+        return
+    
+    with open("data/account.json", "r") as f:
+        try:
+            data = json.load(f)
+        except:
+            data = []
+
+    for user in data:
+        if account_number in user:
+            
+            balance = user[account_number]["Balance"]
+
+            if balance > 0:
+                # Add deposit amount
+                balance += value
+                user[account_number]["Balance"] = balance
+
+                # Save updated balance
+                with open("data/account.json", "w") as f:
+                    json.dump(data, f, indent=4)
+
+                Transaction(account_number,f"Credited from {acc_no}", value,balance)
