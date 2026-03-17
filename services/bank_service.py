@@ -1,11 +1,5 @@
-# Import standard libraries for file handling and JSON storage
-import os
-import json
-
 # Import account base model and transaction logger
 from models.account import Account
-from models.transaction import Transaction
-
 from utils import file_handler
 
 
@@ -18,10 +12,10 @@ class Create_Account:
     Initializes account storage for a user.
     """
 
-    def __init__(self, account_no):
-        self.account_no = account_no
+    def __init__(self, account_number):
+        self.account_no = account_number
 
-        file_handler.create_account_handle(account_no)
+        file_handler.create_account_handle(account_number)
 
 
 # =========================================================

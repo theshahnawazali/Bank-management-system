@@ -1,9 +1,6 @@
 # Import required modules
 from utils import file_handler
 
-# Import account creation service (if needed after signup)
-from services.bank_service import Create_Account
-
 
 # ---------------- BASE USER CLASS ----------------
 class User:

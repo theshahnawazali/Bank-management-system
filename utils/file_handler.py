@@ -76,10 +76,10 @@ def login_handle(username,password):
 
 
 # --------------- Create Account Handler ----------------
-def create_account_handle(account_no):
+def create_account_handle(account_number):
     # Structure initial account data
     new_data = {
-        account_no: {}
+        account_number: {}
     }
 
     file_path = "data/account.json"

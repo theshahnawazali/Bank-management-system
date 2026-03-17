@@ -3,7 +3,7 @@ from services.bank_service import Deposit, Withdraw, get_account, Transactions,T
 from utils import generator
 from models.saving import saving_account 
 from models.current import Current_account
-from utils import validator , hash, file_handler
+from utils import validator , hash
 
 # Display available commands menu
 print("Type login if you have account\n"

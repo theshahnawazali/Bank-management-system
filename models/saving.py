@@ -14,16 +14,16 @@ class saving_account(Account):
         {}
     """
 
-    def __init__(self, name, type, account_no, balance, username):
+    def __init__(self, name, type, account_number, balance, username):
 
         # Initialize base Account class attributes
-        super().__init__(type, name, account_no, balance, username)
+        super().__init__(type, name, account_number, balance, username)
 
         # Store account details locally
         self.__balance = balance
         self.type = type
         self.name = name
-        self.account_number = account_no
+        self.account_number = account_number
         self.username = username
         
         set_account_number(self.username,self.account_number)

@@ -1,7 +1,6 @@
 import random
 import json
 import os
-from utils import validator
 
 # Generate a unique account number and verify it is unique
 
