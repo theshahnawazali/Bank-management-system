@@ -5,17 +5,17 @@
 
 
 # ---------------- USER VALIDATORS -----------------
-
+import streamlit as st
 def validate_username(username):
     """
     Ensure username is valid.
     """
     if not username:
-        raise ValueError("Username cannot be empty")
+        return False
 
-    if len(username) < 3:
-        raise ValueError("Username must be at least 3 characters")
-
+    if len(username) < 4:
+        return False
+        
     return True
 
 
@@ -24,10 +24,8 @@ def validate_password(password):
     Validate password strength.
     """
     if len(password) < 8:
-        raise ValueError("Password must be at least 8 characters long")
-
-    if password.isdigit():
-        raise ValueError("Password cannot be only numbers")
+        return False
+    
 
     return True
 
@@ -37,7 +35,7 @@ def validate_name(name):
     Validate account holder name.
     """
     if not name.strip():
-        raise ValueError("Name cannot be empty")
+        return False
 
     return True
 

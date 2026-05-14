@@ -4,6 +4,12 @@ from utils import generator
 from models.saving import saving_account 
 from models.current import Current_account
 from utils import validator , hash
+# import streamlit as st
+
+# st.switch_page("pages/login.py")
+
+
+
 
 # Display available commands menu
 print("Type login if you have account\n"

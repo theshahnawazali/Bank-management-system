@@ -62,13 +62,13 @@ def login_handle(username,password):
 
                         # Validate password
                         if user[username]["Password"] == password:
-                            print("Log in successful")
+                            return True
                         else:
-                            print("Wrong Password")
+                            return False
 
                 # If username not found in file
                 if not found:
-                    print("User Not Found")
+                    return "user not found"
 
             except json.JSONDecodeError:
                 # Handle invalid JSON format

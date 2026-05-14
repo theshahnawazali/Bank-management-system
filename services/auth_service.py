@@ -47,5 +47,4 @@ class Login(User):
         self.username = username
         self.password = password
 
-        file_handler.login_handle(self.username,self.password)
-        
+        self.status = file_handler.login_handle(self.username,self.password)
