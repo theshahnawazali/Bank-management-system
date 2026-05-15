@@ -29,7 +29,7 @@ class get_account:
     def __init__(self, username):
         self.username = username
 
-        file_handler.get_account_handle(self.username)    
+        self.info = file_handler.get_account_handle(self.username)
 
 
 # =========================================================

@@ -1,8 +1,11 @@
 # header.py
 import streamlit as st
+from pages.header import render_header
 
+render_header()
 
-current_user_username = "User"
+if "user" not in st.session_state:
+    st.session_state.current_user = None
 
 
 if st.button("Login"):

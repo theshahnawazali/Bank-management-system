@@ -94,6 +94,7 @@ def validate_user_logged_in(username):
     Ensure user is authenticated.
     """
     if username == "User":
-        raise PermissionError("User must login first")
+        # raise PermissionError("User must login first")
+        return False
 
     return True

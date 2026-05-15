@@ -130,8 +130,15 @@ def get_account_handle(username):
                     print(f"Name: {user[acc_no]['Name']}")
                     print(f"Balance: {user[acc_no]['Balance']}")
                     print(f"Account Type: {user[acc_no]['Account Type']}")
-                    print(f"Account Number: {acc_no}")                  
+                    print(f"Account Number: {acc_no}")
 
+                    info = {
+                        "Name"              : user[acc_no]["Name"],
+                        "Balance"           : user[acc_no]["Balance"],
+                        "Account Type"      : user[acc_no]["Account Type"],
+                        "Account Number "   : acc_no,
+                    }
+        return info
 
 # --------------- Withdraw Handler ----------------
 def withdraw_handle(username,value):

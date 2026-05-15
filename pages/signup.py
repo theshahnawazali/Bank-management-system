@@ -4,9 +4,9 @@ from services.auth_service import Signup
 from utils import hash
 from models.saving import saving_account 
 from models.current import Current_account
-# from pages.header import render_header
+from pages.header import render_header
 
-# render_header("User")
+render_header("User")
 
 with st.form("sign-up"):
     name = st.text_input("Enter Your Good Name",placeholder="Name")
@@ -49,11 +49,13 @@ if Button:
                         if validator.validate_initial_balance(int(initial_amount)):
                             if account_type == "Saving Account":
                                 saving_account(name, account_type, account_number, initial_amount, username)
+                                st.session_state.current_user = username
                                 st.success("Account Created")
                                 st.switch_page("pages/home.py")
                             else:
                                 Current_account(name, account_type, account_number, initial_amount, username)
                                 st.success("Account Created")
+                                st.session_state.current_user = username
                                 st.switch_page("pages/home.py")
 
                     else:
