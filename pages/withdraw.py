@@ -1,5 +1,8 @@
 import streamlit as st
 from services.bank_service import Withdraw
+from pages.header import render_header
+
+render_header(st.session_state.current_user)
 
 
 with st.form("Deposit"):

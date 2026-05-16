@@ -1,1 +1,2 @@
-# No external dependencies required
+streamlit==1.45.1
+extra-streamlit-components==0.1.71

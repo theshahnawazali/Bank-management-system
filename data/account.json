@@ -22,7 +22,9 @@
                 "15-05-2026 02:19:56 ---> Debited | Amount: 5000 | Balance: 806000",
                 "15-05-2026 02:35:24 ---> Transfered to  | Amount: 72730 | Balance: 733270",
                 "15-05-2026 02:36:12 ---> Transfered to  | Amount: 72730 | Balance: 660540",
-                "15-05-2026 02:36:30 ---> Transfered to 72730 | Amount: 50000 | Balance: 610540"
+                "15-05-2026 02:36:30 ---> Transfered to 72730 | Amount: 50000 | Balance: 610540",
+                "16-05-2026 18:02:22 ---> Credited | Amount: 100000 | Balance: 710540",
+                "16-05-2026 18:02:30 ---> Debited | Amount: 100000 | Balance: 610540"
             ]
         }
     },

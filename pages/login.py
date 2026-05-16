@@ -3,11 +3,7 @@ from utils import validator, hash
 from services.auth_service import Login
 from pages.header import render_header
 
-render_header()
-
-if "user" not in st.session_state:
-    st.session_state.current_user = None
-
+render_header(st.session_state.current_user)
 
 with st.form("Login"):
     username = st.text_input("Enter Your Username", placeholder="Username")

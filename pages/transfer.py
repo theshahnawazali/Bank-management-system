@@ -1,5 +1,8 @@
 import streamlit as st
 from services.bank_service import Transfer
+from pages.header import render_header
+
+render_header(st.session_state.current_user)
 
 with st.form("Transfer"):
     Account_number = st.text_input("Enter Account Number",placeholder="Account Number")

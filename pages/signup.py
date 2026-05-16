@@ -6,7 +6,7 @@ from models.saving import saving_account
 from models.current import Current_account
 from pages.header import render_header
 
-render_header("User")
+render_header(st.session_state.current_user)
 
 with st.form("sign-up"):
     name = st.text_input("Enter Your Good Name",placeholder="Name")
