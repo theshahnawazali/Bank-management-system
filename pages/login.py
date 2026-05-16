@@ -2,6 +2,7 @@ import streamlit as st
 from utils import validator, hash
 from services.auth_service import Login
 from pages.header import render_header
+from utils.auth import login_user
 
 render_header(st.session_state.current_user)
 
@@ -25,7 +26,7 @@ if Button:
             # Varify Login
             if obj.status == True:
                 st.success("Log in successful")
-                st.session_state.current_user = username
+                login_user(username)
                 st.switch_page("pages/home.py")
 
             elif obj.status == "user not found":

@@ -2,6 +2,11 @@ import streamlit as st
 from utils import validator
 from services.bank_service import get_account
 from pages.header import render_header
+from utils.auth import load_user
+
+current_user = load_user()
+
+
 
 
 if st.session_state.current_user == None:
@@ -9,7 +14,7 @@ if st.session_state.current_user == None:
 
 
  # ---------------- HEADER ----------------
-render_header(st.session_state.current_user)
+render_header(current_user)
 
 # st.markdown("### Services ")
 

@@ -5,6 +5,7 @@ from utils import hash
 from models.saving import saving_account 
 from models.current import Current_account
 from pages.header import render_header
+from utils.auth import login_user
 
 render_header(st.session_state.current_user)
 
@@ -49,7 +50,7 @@ if Button:
                         if validator.validate_initial_balance(int(initial_amount)):
                             if account_type == "Saving Account":
                                 saving_account(name, account_type, account_number, initial_amount, username)
-                                st.session_state.current_user = username
+                                login_user(username)
                                 st.success("Account Created")
                                 st.switch_page("pages/home.py")
                             else:

@@ -1,4 +1,5 @@
 import streamlit as st
+from utils.auth import logout_user
 
 def render_header(current_user):
     st.markdown("""
@@ -34,5 +35,5 @@ def render_header(current_user):
                 st.switch_page("pages/login.py")
         else:
             if st.button("Logout", key="Logout_button"):
-                st.session_state.current_user = None
+                logout_user()
                 st.switch_page("pages/home.py")

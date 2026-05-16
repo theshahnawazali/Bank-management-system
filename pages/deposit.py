@@ -1,8 +1,11 @@
 import streamlit as st
 from services.bank_service import Deposit
 from pages.header import render_header
+from utils.auth import load_user
 
-render_header(st.session_state.current_user)
+current_user = load_user()
+
+render_header(current_user)
 
 
 with st.form("Deposit"):
