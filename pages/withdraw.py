@@ -5,16 +5,17 @@ from utils.auth import load_user
 
 current_user = load_user()
 
+st.set_page_config(page_title="Withdraw",layout="wide")
+
 render_header(current_user)
 
+st.markdown("### Amount Withdrawal Form")
 
 with st.form("Deposit"):
     amount = st.text_input("Enter Amount",placeholder="Amount")
     btn = st.form_submit_button("Deposit")
 
 if btn:
-    
-    print(st.session_state.current_user)
     if amount.isdigit():
         amount = int(amount)
         Withdraw(st.session_state.current_user, amount)

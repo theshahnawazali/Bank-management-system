@@ -82,7 +82,7 @@ class Transactions:
         self.transaction()
 
     def transaction(self):
-        file_handler.transaction_handler(self.account_username)
+        self.trans = file_handler.transaction_handler(self.account_username)
         
 
 

@@ -27,7 +27,6 @@ class Account:
         self.__balance = int(balance)            # Private balance
         self.username = username
 
-        print(self.name, self.type)
 
         # Structure account data for storage
         new_data = {

@@ -2,9 +2,19 @@ import streamlit as st
 from utils import validator, hash
 from services.auth_service import Login
 from pages.header import render_header
-from utils.auth import login_user
+from utils.auth import login_user, load_user
 
-render_header(st.session_state.current_user)
+st.set_page_config(page_title="Login", layout="wide")
+
+current_user = load_user()
+
+if current_user != None:
+    st.switch_page("pages/home.py")
+
+
+render_header(current_user)
+
+st.markdown("### 👤 User Login")
 
 with st.form("Login"):
     username = st.text_input("Enter Your Username", placeholder="Username")

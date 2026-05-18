@@ -9,6 +9,8 @@ from utils.auth import login_user
 
 render_header(st.session_state.current_user)
 
+st.markdown("### 👤 User Sign Up")
+
 with st.form("sign-up"):
     name = st.text_input("Enter Your Good Name",placeholder="Name")
     username = st.text_input("Enter Unique username",placeholder="Username")

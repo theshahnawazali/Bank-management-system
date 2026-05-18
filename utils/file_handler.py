@@ -127,16 +127,12 @@ def get_account_handle(username):
             
             for user in data:
                 if acc_no in user:
-                    print(f"Name: {user[acc_no]['Name']}")
-                    print(f"Balance: {user[acc_no]['Balance']}")
-                    print(f"Account Type: {user[acc_no]['Account Type']}")
-                    print(f"Account Number: {acc_no}")
-
                     info = {
                         "Name"              : user[acc_no]["Name"],
                         "Balance"           : user[acc_no]["Balance"],
                         "Account Type"      : user[acc_no]["Account Type"],
                         "Account Number "   : acc_no,
+                        "Account Username"  : username,
                     }
         return info
 
@@ -170,9 +166,6 @@ def withdraw_handle(username,value):
                 # Save updated balance
                 with open("data/account.json", "w") as f:
                     json.dump(data, f, indent=4)
-
-                print("Withdraw successful")
-                print("New Balance:", balance)
 
                 # Record transaction log
                 Transaction(acc_no, "Debited", value, balance)
@@ -237,11 +230,13 @@ def transaction_handler(username):
         with open("data/account.json", "r") as f:
             data = json.load(f)
 
+    return data
+
         # Print transaction list
-        for user in data:
-            if acc_no in user:
-                for trans in user[acc_no]["Transaction"]:
-                    print(trans)
+        # for user in data:
+        #     if acc_no in user:
+        #         for trans in user[acc_no]["Transaction"]:
+        #             print(trans)
 
 # --------------- Set Account Number ----------------
 def set_account_number(username,account_number):

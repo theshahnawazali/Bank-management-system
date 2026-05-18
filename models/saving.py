@@ -27,6 +27,3 @@ class saving_account(Account):
         self.username = username
         
         set_account_number(self.username,self.account_number)
-        
-        # Confirmation message
-        print("Your Saving Account is Open..")

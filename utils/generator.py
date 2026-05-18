@@ -23,12 +23,6 @@ def generate_acc():
 
 # Ensure the username is unique
 def check_username(username):
-    # username = input("Enter an unique Username: ").lower()
-    # while len(username) < 4:
-    #     print("Username should be minimum 4 charecter")
-    #     username = input("Enter an unique Username: ").lower()
-
-
     if os.path.exists("data/user.json"):
         with open("data/user.json","r") as f:
             try:

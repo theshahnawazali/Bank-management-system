@@ -5,7 +5,12 @@ from utils.auth import load_user
 
 current_user = load_user()
 
+st.set_page_config(page_title="Tranfer",layout="wide")
+
 render_header(current_user)
+
+
+st.markdown("### Amount Transfer Form")
 
 with st.form("Transfer"):
     Account_number = st.text_input("Enter Account Number",placeholder="Account Number")

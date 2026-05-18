@@ -19,7 +19,7 @@ def render_header(current_user):
     col1, col2, col3, col4 = st.columns([3, 2, 2, 1])
 
     with col1:
-        st.markdown("## My Company")
+        st.markdown("## BankCore")
 
     with col2:
         pass
@@ -36,4 +36,3 @@ def render_header(current_user):
         else:
             if st.button("Logout", key="Logout_button"):
                 logout_user()
-                st.switch_page("pages/home.py")

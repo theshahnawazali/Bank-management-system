@@ -28,6 +28,3 @@ class Current_account(Account):
         self.username = username
 
         set_account_number(self.username,self.account_number)
-
-        # Confirmation message
-        print("Your Current Account is Open..")

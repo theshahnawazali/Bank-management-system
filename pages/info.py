@@ -8,8 +8,10 @@ current_user = load_user()
 
 render_header(current_user)
 
-if validator.validate_user_logged_in(st.session_state.current_user):
-    user = get_account(st.session_state.current_user)
+st.markdown("### User Informations")
+
+if validator.validate_user_logged_in(current_user):
+    user = get_account(current_user)
     for key, value in user.info.items():
         st.write(f"{key} : {value}")
 
