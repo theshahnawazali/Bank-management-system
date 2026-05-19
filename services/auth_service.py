@@ -30,8 +30,8 @@ class Signup(User):
         self.username = username
         self.password = password
 
-        file_handler.signup_handle(self.username,self.name,self.password)
-        signup_handle(self.name,self.username,self.password)
+        # file_handler.signup_handle(self.username,self.name,self.password)
+        self.user_id = signup_handle(self.name,self.username,self.password)
 
 # ---------------- LOGIN CLASS ----------------
 class Login(User):

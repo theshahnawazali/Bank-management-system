@@ -1,6 +1,8 @@
 from models.saving import saving_account
+from services.auth_service import Signup
 import bcrypt
 from utils.auth import login_handle
+from models.saving import saving_account 
 
 # saving_account(1,"Shahnawaz Ali","Saving Account",1234845789,1000,"Shahnawaz")
 
@@ -16,10 +18,14 @@ def verify_password(password, hashed_password):
         hashed_password.encode()
     )
 
-p = hash_password("password")
-print(p)
-q = verify_password("password",p)
-print(q)
+# p = hash_password("password")
+# print(p)
+# q = verify_password("password",p)
+# print(q)
 
-x = login_handle("shahnawaz")
-print(x[0])
+# x = login_handle("shahnawaz")
+# print(x[0])
+
+# user_id = Signup("Shahnawaz Ali","asdfghjkl","password")
+# print(user_id.user_id)
+# saving_account(user_id.user_id,"Shahnawaz Ali","Saving Account",147852369852,5000,"asdfghjkl")

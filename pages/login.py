@@ -25,6 +25,7 @@ with st.form("Login"):
 
 if Button:
     # Validate Username
+    username = username.lower().strip()
     if validator.validate_username(username):
         # Validate Password
         if validator.validate_password(password):
@@ -34,6 +35,7 @@ if Button:
 
             if user == None:
                 st.error("Incorrect Username")
+                st.stop()
 
             else: 
                 verify_password = hash.verify_password(password,user[0])

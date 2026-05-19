@@ -17,16 +17,15 @@ class Current_account(Account):
     """
 
 
-    def __init__(self,user_id, name, account_type, account_number, balance, username):
+    def __init__(self,user_id, name, account_type, account_number, balance):
 
         # Initialize base Account class attributes
-        super().__init__(user_id, name, account_type, account_number, balance, username)
+        super().__init__(user_id, name, account_type, account_number, balance)
 
         # Store account details locally
         self.account_type = account_type
         self.name = name
         self.account_number = account_number
-        self.username = username
 
         # set_account_number(self.username,self.account_number)
         # create_account_handle(self.user_id,self.account_number,"Current Account",self.__balance,"Active")
