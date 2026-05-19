@@ -1,7 +1,7 @@
 import streamlit as st
 from utils import validator, generator
 from services.auth_service import Signup
-from utils import hash
+from utils.hash import hash_password
 from models.saving import saving_account 
 from models.current import Current_account
 from pages.header import render_header
@@ -42,16 +42,16 @@ if Button:
             unique_username = generator.check_username(username)
             if unique_username:
                 if validator.validate_password(password):
-                    secured_password = hash.secure_password(password)
-                    # Create new user account
-                    Signup(name, username, secured_password)
-
+                    secured_password = hash_password(password)
+                    user_id = Signup(name,unique_username,secured_password)
                     if validator.validate_account_type(account_type):
                         account_number = generator.generate_acc()
                         
                         if validator.validate_initial_balance(int(initial_amount)):
                             if account_type == "Saving Account":
-                                saving_account(name, account_type, account_number, initial_amount, username)
+                                # Creating a Saving account
+                                saving_account(user_id, name, account_type, account_number, initial_amount, username)
+                                
                                 login_user(username)
                                 st.success("Account Created")
                                 st.switch_page("pages/home.py")
@@ -60,6 +60,8 @@ if Button:
                                 st.success("Account Created")
                                 st.session_state.current_user = username
                                 st.switch_page("pages/home.py")
+                        else:
+                            st.error("Amount Should be greater then 0")
 
                     else:
                         st.write("Musibat")

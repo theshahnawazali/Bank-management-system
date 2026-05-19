@@ -1,40 +1,33 @@
 import random
-import json
-import os
+from data.db import cursor
 
 # Generate a unique account number and verify it is unique
 
 def generate_acc():
-    a = random.randint(10000,99999)
-    if os.path.exists("data/account.json"):
-        with open("data/account.json","r") as f:
-            try:
-                data = json.load(f)
-                for user in data:
-                    if str(a) in user:
-                        generate_acc()
-                    else:
-                        pass
-                    
-            except:
-                print("Error")
+    account_number = random.randint(100000000000, 999999999999)
+    cursor.execute(f"""
+        SELECT account_number FROM accounts WHERE account_number = {account_number}
+    """)
+    unique = cursor.fetchone()
 
-    return a
+    if unique == None:
+        return account_number
+    else:
+        generate_acc()
+    
+
+
+    
 
 # Ensure the username is unique
 def check_username(username):
-    if os.path.exists("data/user.json"):
-        with open("data/user.json","r") as f:
-            try:
-                data = json.load(f)
-                for user in data:
-                    if username in user:
-                        # print("Username already exits. Try another.")
-                        # check_username()
-                        return False
-                    else:
-                        pass
-            except:
-                print("Error")
+    cursor.execute(f"""
+        SELECT username FROM users WHERE username = '{username}'
+    """)
 
-    return True
+    unique = cursor.fetchone()
+    if unique == None:
+        return True
+    else:
+        return False
+    

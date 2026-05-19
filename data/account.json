@@ -61,5 +61,14 @@
             "Account Type": "Current Account",
             "Transaction": []
         }
+    },
+    {
+        "123456789": {
+            "Name": "Shahnawaz Ali",
+            "Balance": 100,
+            "username": "Shahnawaz",
+            "Account Type": "Saving Account",
+            "Transaction": []
+        }
     }
 ]

@@ -3,6 +3,7 @@ from utils import validator, hash
 from services.auth_service import Login
 from pages.header import render_header
 from utils.auth import login_user, load_user
+from utils.auth import login_handle
 
 st.set_page_config(page_title="Login", layout="wide")
 
@@ -27,23 +28,22 @@ if Button:
     if validator.validate_username(username):
         # Validate Password
         if validator.validate_password(password):
-            print(type(password))
-            secured_password = hash.secure_password(password)
-            print(secured_password)
+            
+            user = login_handle(username)
 
-            obj = Login(username,secured_password)
 
-            # Varify Login
-            if obj.status == True:
-                st.success("Log in successful")
-                login_user(username)
-                st.switch_page("pages/home.py")
+            if user == None:
+                st.error("Incorrect Username")
 
-            elif obj.status == "user not found":
-                st.error("User not found")
+            else: 
+                verify_password = hash.verify_password(password,user[0])
 
-            else:
-                st.error("Wrong Password")
+                if verify_password:
+                    st.success("Login Successfull")
+                    # st.switch_page("pages/home.py")
+                    # login_user(username)
+                else:
+                    st.error("Incorrect Password")
         
         else:
             st.error("Password must be atleast 8 characters long")

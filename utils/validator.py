@@ -5,7 +5,6 @@
 
 
 # ---------------- USER VALIDATORS -----------------
-import streamlit as st
 def validate_username(username):
     """
     Ensure username is valid.

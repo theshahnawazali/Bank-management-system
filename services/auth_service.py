@@ -1,6 +1,6 @@
 # Import required modules
 from utils import file_handler
-
+from utils.auth import signup_handle
 
 # ---------------- BASE USER CLASS ----------------
 class User:
@@ -31,7 +31,7 @@ class Signup(User):
         self.password = password
 
         file_handler.signup_handle(self.username,self.name,self.password)
-
+        signup_handle(self.name,self.username,self.password)
 
 # ---------------- LOGIN CLASS ----------------
 class Login(User):
