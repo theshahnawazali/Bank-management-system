@@ -39,15 +39,37 @@ cursor.execute("""
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS transactions (
-               transaction_id INT PRIMARY KEY,
+               transaction_id INT PRIMARY KEY AUTO_INCREMENT,
                account_id INT,
                FOREIGN KEY (account_id) REFERENCES accounts(account_id)
                     ON UPDATE CASCADE
                     ON DELETE SET NULL,
                
-               transaction_type ENUM('Deposits','Withdraw','Transfer'),
                amount DECIMAL(12,2),
+               reference_no VARCHAR(50) UNIQUE,
+               transaction_type ENUM('Deposits','Withdraw','Transfer'),
                transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
-               description TEXT
+               transaction_status ENUM('Success','Pending','Failed'),
+               description TEXT NULL
+               );
+    """)
+
+
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS sessions (
+               session_id INT PRIMARY KEY AUTO_INCREMENT,
+               user_id INT,
+               session_token VARCHAR(255) UNIQUE,
+
+               FOREIGN KEY (user_id) REFERENCES users(user_id)
+                ON UPDATE CASCADE
+                ON DELETE CASCADE,
+               
+               login_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+               logout_time DATETIME NULL,
+
+               ip_addresses VARCHAR(50),
+               device_info TEXT,
+               status ENUM('Active','Expired','LoggedOut') DEFAULT 'Active'
                );
     """)

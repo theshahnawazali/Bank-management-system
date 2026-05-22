@@ -1,5 +1,7 @@
 import random
 from data.db import cursor
+import secrets
+from datetime import datetime
 
 # Generate a unique account number and verify it is unique
 
@@ -30,4 +32,13 @@ def check_username(username):
         return True
     else:
         return False
+    
+# Generates Reference number and ensure it is unique
+def generate_reference_number():
+    
+    date_part = datetime.now().strftime("%Y%m%d")
+    random_part = secrets.randbelow(9000) + 1000
+    reference_no = f"TXN{date_part}{random_part}"
+
+    return reference_no
     

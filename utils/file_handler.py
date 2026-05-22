@@ -5,8 +5,8 @@
 
 import os
 import json
-
-from models.transaction import Transaction
+from utils.generator import generate_reference_number
+from data.db import cursor, conn
 
 # --------------- Signup Handler ----------------
 def signup_handle(username,name,password):
@@ -110,107 +110,73 @@ def create_account_handle(account_number):
 
 # --------------- Get Account Handler ----------------
 def get_account_handle(username):
-    # Check if user file exists
-        if os.path.exists("data/user.json"):
-            with open("data/user.json", "r") as f:
-                data = json.load(f)
+        cursor.execute(f"""
+            SELECT users.full_name, users.user_id FROM users JOIN accounts ON users.user_id = accounts.user_id WHERE username = '{username}';
+        """)
+        user_data = cursor.fetchone()
 
-                # Find matching user
-                for user in data:
-                    if username in user:
-                        acc_no = str(user[username]["Account Number"])
+        cursor.execute(f"""
+            SELECT account_number, account_type, balance, status FROM accounts WHERE user_id = {user_data[1]}
+        """)
+        account_data = cursor.fetchone()
 
-            
-        if os.path.exists("data/account.json"):
-            with open("data/account.json", "r") as f:
-                data = json.load(f)
-            
-            for user in data:
-                if acc_no in user:
-                    info = {
-                        "Name"              : user[acc_no]["Name"],
-                        "Balance"           : user[acc_no]["Balance"],
-                        "Account Type"      : user[acc_no]["Account Type"],
-                        "Account Number "   : acc_no,
-                        "Account Username"  : username,
-                    }
+        info = {
+            "Name"              : user_data[0],
+            "Balance"           : account_data[2],
+            "Account Type"      : account_data[1],
+            "Account Number "   : account_data[0],
+            "Account Username"  : username,
+        }
         return info
 
 # --------------- Withdraw Handler ----------------
 def withdraw_handle(username,value):
-    # Check if user file exists
-    if os.path.exists("data/user.json"):
-        with open("data/user.json", "r") as f:
-            data = json.load(f)
+    cursor.execute(f"""
+        SELECT users.full_name, users.user_id FROM users JOIN accounts ON users.user_id = accounts.user_id WHERE username = '{username}';
+    """)
+    user_data = cursor.fetchone()
 
-            # Find matching user
-            for user in data:
-                if username in user:
-                    acc_no = str(user[username]["Account Number"])
+    cursor.execute(f"""
+        SELECT balance FROM accounts WHERE user_id = {user_data[1]}
+                   """)
+    
+    amount = cursor.fetchone()
 
-        
-    if os.path.exists("data/account.json"):
-        with open("data/account.json", "r") as f:
-            data = json.load(f)
+    if value <= amount[0]:
+        cursor.execute("""
+            UPDATE accounts SET balance = balance - %s WHERE user_id = %s   
+        """,(value,user_data[1]))
 
-    # Search for user account
-    for user in data:
-        if acc_no in user:
-            balance = user[acc_no]["Balance"]
-
-            # Check sufficient balance
-            if balance >= value:
-                balance -= value
-                user[acc_no]["Balance"] = balance
-
-                # Save updated balance
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
-
-                # Record transaction log
-                Transaction(acc_no, "Debited", value, balance)
-
-            else:
-                print("Insufficient Amount")
-
+        conn.commit()
+        return True
+    
+    return False
 
 # --------------- Deposit Handler ----------------
 def deposit_handle(username,value):
-    # Check if user file exists
-    if os.path.exists("data/user.json"):
-        with open("data/user.json", "r") as f:
-            data = json.load(f)
+    cursor.execute(f"""
+        SELECT users.full_name, users.user_id FROM users JOIN accounts ON users.user_id = accounts.user_id WHERE username = '{username}';
+    """)
+    user_data = cursor.fetchone()
 
-            # Find matching user
-            for user in data:
-                if username in user:
-                    acc_no = str(user[username]["Account Number"])
+    cursor.execute(f"""
+        SELECT balance FROM accounts WHERE user_id = {user_data[1]}
+                   """)
+    
+    amount = cursor.fetchone()
 
-        
-    if os.path.exists("data/account.json"):
-        with open("data/account.json", "r") as f:
-            data = json.load(f)
+    if amount[0] > 0:
+        cursor.execute("""
+            UPDATE accounts SET balance = balance + %s WHERE user_id = %s   
+        """,(value,user_data[1]))
 
-    # Search for user account
-    for user in data:
-        if acc_no in user:
-            balance = user[acc_no]["Balance"]
-
-            # Check sufficient balance
-            if balance > 0:
-                # Add deposit amount
-                balance += value
-                user[acc_no]["Balance"] = balance
-
-                # Save updated balance
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
-
-                print("Deposit successful")
-                print("New Balance:", balance)
+        conn.commit()
+        return True
+    
+    return False
 
                 # Record transaction
-                Transaction(acc_no, "Credited", value, balance)
+                # Transaction(acc_no, "Credited", value, balance)
 
 
 # --------------- Transaction Handler ----------------
@@ -238,6 +204,28 @@ def transaction_handler(username):
         #         for trans in user[acc_no]["Transaction"]:
         #             print(trans)
 
+def update_transaction(username,amount,transaction_type,transaction_status):
+    cursor.execute("""
+        SELECT user_id FROM users WHERE username = %s
+                   """,(username,))
+    
+    user_id = cursor.fetchone()
+
+    cursor.execute("""
+        SELECT account_id FROM accounts WHERE user_id = %s
+                   """,(user_id[0],))
+    
+    account = cursor.fetchone()
+
+    reference_no = generate_reference_number()
+
+    cursor.execute("""
+        INSERT INTO transactions (account_id,amount, reference_no, transaction_type, transaction_status) VALUE (%s, %s, %s, %s, %s)
+    """,(account[0],amount,reference_no,transaction_type,transaction_status))
+
+    conn.commit()
+
+
 # --------------- Set Account Number ----------------
 def set_account_number(username,account_number):
     if not os.path.exists("data/user.json"):
@@ -259,59 +247,31 @@ def set_account_number(username,account_number):
 
 # --------------- Transfer Handler ----------------
 def transfer_handle(username,value,account_number):
-    # Check if user file exists
-    if os.path.exists("data/user.json"):
-        with open("data/user.json", "r") as f:
-            data = json.load(f)
+    cursor.execute(f"""
+        SELECT users.full_name, users.user_id FROM users JOIN accounts ON users.user_id = accounts.user_id WHERE username = '{username}';
+    """)
+    user_id = cursor.fetchone()
 
-            # Find matching user
-            for user in data:
-                if username in user:
-                    acc_no = str(user[username]["Account Number"])
-
-        
-    if os.path.exists("data/account.json"):
-        with open("data/account.json", "r") as f:
-            data = json.load(f)
-
-    # Search for user account
-    for user in data:
-        if acc_no in user:
-            print(user[acc_no]["Balance"])
-            balance = user[acc_no]["Balance"]
-            # Check sufficient balance
-            if balance >= value:
-                balance -= value
-                user[acc_no]["Balance"] = balance
-
-                # Save updated balance
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
-
-                Transaction(acc_no,f"Transfered to {account_number}", value,balance)
-                
-    if not os.path.exists("data/account.json"):
-        print("Account file not found")
-        return
+    cursor.execute(f"""
+        SELECT balance FROM accounts WHERE user_id = {user_id[1]}
+                   """)
     
-    with open("data/account.json", "r") as f:
-        try:
-            data = json.load(f)
-        except:
-            data = []
+    amount = cursor.fetchone()
 
-    for user in data:
-        if account_number in user:
-            
-            balance = user[account_number]["Balance"]
+    if value <= amount[0]:
+        cursor.execute("""
+            UPDATE accounts SET balance = balance - %s WHERE user_id = %s   
+        """,(value,user_id[1]))
 
-            if balance > 0:
-                # Add deposit amount
-                balance += value
-                user[account_number]["Balance"] = balance
+        conn.commit()
 
-                # Save updated balance
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
+        cursor.execute("""
+            UPDATE accounts SET balance = balance + %s WHERE account_number = %s
+        """,(value,account_number))
 
-                Transaction(account_number,f"Credited from {acc_no}", value,balance)
+        conn.commit()
+        return True
+    
+    return False
+
+    #             Transaction(account_number,f"Credited from {acc_no}", value,balance)

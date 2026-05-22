@@ -1,7 +1,7 @@
 # Import account base model and transaction logger
 from models.account import Account
 from utils import file_handler
-
+from models.transaction import Transaction
 
 # =========================================================
 # CREATE ACCOUNT
@@ -47,7 +47,13 @@ class Withdraw:
 
     def withdraw(self):
         
-        file_handler.withdraw_handle(self.account_username,self.value)
+        self.withdraw = file_handler.withdraw_handle(self.account_username,self.value)
+
+        Transaction(
+            self.account_username,
+            "Withdraw",
+            self.value
+        )
         
 
 
@@ -66,7 +72,13 @@ class Deposit:
         self.deposit()
 
     def deposit(self):
-        file_handler.deposit_handle(self.account_username,self.value)
+        self.deposit = file_handler.deposit_handle(self.account_username,self.value)
+
+        Transaction(
+            self.account_username,
+            "Deposits",
+            self.value
+        )
 
 
 # =========================================================
@@ -83,6 +95,7 @@ class Transactions:
 
     def transaction(self):
         self.trans = file_handler.transaction_handler(self.account_username)
+        
         
 
 
@@ -107,8 +120,15 @@ class Transfer:
         self.transfer()
 
     def transfer(self):
-            file_handler.transfer_handle(self.username,self.value,self.account_number)
-        
+            self.transfer = file_handler.transfer_handle(self.username,self.value,self.account_number)
+
+            Transaction(
+                self.username,
+                "Transfer",
+                self.value,
+            )
+            
+            
 
 
 # =========================================================

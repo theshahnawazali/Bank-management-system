@@ -1,9 +1,15 @@
 # header.py
 import streamlit as st
+
+st.set_page_config(
+    page_title="BankCore",
+    page_icon="🏦",
+    layout="wide"
+    )
+
 from pages.header import render_header
+from utils.verify_login import verify_login_session
 
-
-st.set_page_config(page_title="BankCore", page_icon="🏦",layout="wide")
 
 if "user" not in st.session_state:
     st.session_state.current_user = None

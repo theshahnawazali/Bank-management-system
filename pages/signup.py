@@ -5,8 +5,8 @@ from utils.hash import hash_password
 from models.saving import saving_account 
 from models.current import Current_account
 from pages.header import render_header
-from utils.auth import login_user
-
+from utils.login import update_login_info
+from utils.token import generate_session_token
 
 render_header(st.session_state.current_user)
 
@@ -45,32 +45,44 @@ if Button:
             if unique_username:
                 if validator.validate_password(password):
                     secured_password = hash_password(password)
-                    user_id = Signup(
-                        name,
-                        username,
-                        secured_password
-                    )
+                    
                     if validator.validate_account_type(account_type):
                         account_number = generator.generate_acc()
                         
                         if validator.validate_initial_balance(int(initial_amount)):
+                            user_id = Signup(
+                                name,
+                                username,
+                                secured_password
+                            )
                             if account_type == "Saving Account":
                                 # Creating a Saving account
                                 saving_account(
                                     user_id.user_id,
-                                    name,account_type,
+                                    name,
+                                    account_type,
                                     account_number,
                                     initial_amount
                                 )
                                 
                                 # login_user(username)
                                 st.success("Account Created")
-                                # st.switch_page("pages/home.py")
+
+                                update_login_info(username)
+
+                                st.switch_page("pages/home.py")
+                                
                             else:
-                                Current_account(name, account_type, account_number, initial_amount, username)
+                                Current_account(
+                                    user_id.user_id,
+                                    name,
+                                    account_type,
+                                    account_number,
+                                    initial_amount
+                                )
                                 st.success("Account Created")
-                                # st.session_state.current_user = username
-                                # st.switch_page("pages/home.py")
+                                update_login_info(username)
+                                st.switch_page("pages/home.py")
                         else:
                             st.error("Amount Should be greater then 0")
 

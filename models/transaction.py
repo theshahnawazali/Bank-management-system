@@ -6,6 +6,7 @@
 import os
 import json
 from datetime import datetime
+from utils.file_handler import update_transaction
 
 
 def current_time():
@@ -27,14 +28,21 @@ class Transaction:
         trans_type       : str  -> Transaction type (Credited / Debited)
         amount           : int  -> Transaction amount
         total            : int  -> Updated account balance after transaction
+        type             : str  -> Transaction Stutus
     """
 
-    def __init__(self, account_username, trans_type, amount, total):
+    def __init__(
+            self,
+            account_username : str,
+            trans_type       : str,
+            amount           : int,
+            status           : str = "Success"
+    ):
         # Store transaction details
         self.account_username = account_username
         self.trans_type = trans_type
         self.amount = amount
-        self.total = total
+        self.status = status
 
         # Automatically log transaction
         self.transacton()
@@ -44,31 +52,39 @@ class Transaction:
         Append transaction record into account.json file.
         """
 
-        # Ensure account file exists
-        if not os.path.exists("data/account.json"):
-            print("Account file not found")
-            return
+        update_transaction(
+            self.account_username,
+            self.amount,
+            self.trans_type,
+            self.status
+        )
 
-        # Load account data
-        with open("data/account.json", "r") as f:
-            data = json.load(f)
 
-        # Search for matching user account
-        for user in data:
-            if self.account_username in user:
+        # # Ensure account file exists
+        # if not os.path.exists("data/account.json"):
+        #     print("Account file not found")
+        #     return
 
-                # Append formatted transaction entry
-                user[self.account_username]["Transaction"].append(
-                    f"{current_time()} ---> "
-                    f"{self.trans_type} | "
-                    f"Amount: {self.amount} | "
-                    f"Balance: {self.total}"
-                )
+        # # Load account data
+        # with open("data/account.json", "r") as f:
+        #     data = json.load(f)
 
-                # Save updated transaction log
-                with open("data/account.json", "w") as f:
-                    json.dump(data, f, indent=4)
+        # # Search for matching user account
+        # for user in data:
+        #     if self.account_username in user:
 
-                break
+        #         # Append formatted transaction entry
+        #         user[self.account_username]["Transaction"].append(
+        #             f"{current_time()} ---> "
+        #             f"{self.trans_type} | "
+        #             f"Amount: {self.amount} | "
+        #             f"Balance: {self.total}"
+        #         )
+
+        #         # Save updated transaction log
+        #         with open("data/account.json", "w") as f:
+        #             json.dump(data, f, indent=4)
+
+        #         break
 
         # If account not found, nothing happens (optional improvement: print message)

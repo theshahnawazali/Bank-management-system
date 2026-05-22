@@ -2,12 +2,20 @@ import streamlit as st
 from services.bank_service import Transfer
 from pages.header import render_header
 from utils.auth import load_user
+from utils.verify_login import verify_login_session
 
-current_user = load_user()
+st.set_page_config(
+    page_title="Transfer",
+    layout="wide"
+)
 
-st.set_page_config(page_title="Tranfer",layout="wide")
+user = verify_login_session()
 
-render_header(current_user)
+if user == None:
+    st.switch_page("app.py")
+
+# ---------------- HEADER ----------------
+render_header(user["username"])
 
 
 st.markdown("### Amount Transfer Form")
@@ -18,8 +26,21 @@ with st.form("Transfer"):
     btn = st.form_submit_button("Transfer")
 
 if btn:
-    if Amount.isdigit():
-        Amount = int(Amount)
-        Transfer(st.session_state.current_user,Amount,Account_number)
-        st.success("Amount Transfer Successful")
-        st.switch_page("pages/home.py")
+    try:
+        Amount = float(Amount)
+
+        if Amount <= 0:
+            st.error("Amount should be greater then 0")
+            st.stop()
+
+        status = Transfer(user["username"],Amount,Account_number)
+        
+
+        if status.transfer:
+            st.success("Amount Transfer Successfull")
+            st.switch_page("pages/home.py")
+        else:
+            st.error("Insufficient Amount")
+    
+    except ValueError:
+        st.error("Amount should be in Number Only")
