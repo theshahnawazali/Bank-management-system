@@ -7,6 +7,16 @@ from models.current import Current_account
 from pages.header import render_header
 from utils.login import update_login_info
 from utils.token import generate_session_token
+from utils.verify_login import verify_login_session
+
+
+user = verify_login_session()
+
+if user is None:
+    pass
+else:
+    st.switch_page("pages/home.py")
+
 
 render_header(st.session_state.current_user)
 

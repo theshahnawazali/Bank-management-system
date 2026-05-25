@@ -1,12 +1,21 @@
 import streamlit as st
-from pages.header import render_header
-from utils.auth import load_user
+from templates import header,sidebar
 from services.bank_service import Transactions
+from utils.verify_login import verify_login_session
 
 
 st.set_page_config(page_title="📊 Transactions",layout="wide")
-current_user = load_user()
-render_header(current_user)
+
+# --------------------- Headers -----------------------------
+sidebar.sidebar()
+header.user_header("Transaction")
+
+# ----------------- Verify Login ----------------------------
+user = verify_login_session()
+
+if user == None:
+    st.switch_page("app.py")
+
 
 st.markdown("### 📊 All Transactions")
 

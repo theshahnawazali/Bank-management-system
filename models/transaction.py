@@ -6,7 +6,7 @@
 import os
 import json
 from datetime import datetime
-from utils.file_handler import update_transaction
+from utils.file_handler import update_transaction, get_username_via_account_number
 
 
 def current_time():
@@ -36,11 +36,13 @@ class Transaction:
             account_username : str,
             trans_type       : str,
             amount           : int,
+            account_number   : int = None,
             status           : str = "Success"
     ):
         # Store transaction details
         self.account_username = account_username
         self.trans_type = trans_type
+        self.account_number = account_number
         self.amount = amount
         self.status = status
 
@@ -59,32 +61,15 @@ class Transaction:
             self.status
         )
 
+        if self.trans_type == "Transfer":
+            self.update_reciever_transaction()
 
-        # # Ensure account file exists
-        # if not os.path.exists("data/account.json"):
-        #     print("Account file not found")
-        #     return
+    def update_reciever_transaction(self):
+        reciever_username = get_username_via_account_number(self.account_number)
 
-        # # Load account data
-        # with open("data/account.json", "r") as f:
-        #     data = json.load(f)
-
-        # # Search for matching user account
-        # for user in data:
-        #     if self.account_username in user:
-
-        #         # Append formatted transaction entry
-        #         user[self.account_username]["Transaction"].append(
-        #             f"{current_time()} ---> "
-        #             f"{self.trans_type} | "
-        #             f"Amount: {self.amount} | "
-        #             f"Balance: {self.total}"
-        #         )
-
-        #         # Save updated transaction log
-        #         with open("data/account.json", "w") as f:
-        #             json.dump(data, f, indent=4)
-
-        #         break
-
-        # If account not found, nothing happens (optional improvement: print message)
+        update_transaction(
+            reciever_username,
+            self.amount,
+            "Recieved",
+            self.status
+        )

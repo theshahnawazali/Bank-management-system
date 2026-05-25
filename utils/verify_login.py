@@ -5,8 +5,11 @@ def verify_login_session():
 
     cookie_user = load_user()
 
+
+
     if not cookie_user:
         return None
+    
     
     if len(cookie_user) < 2:
         return None
@@ -14,6 +17,9 @@ def verify_login_session():
     user_id = cookie_user[1]
     cookie_token = cookie_user[0]
 
+    if user_id is None:
+        return None
+    
     token_data = get_user_token(user_id)
 
     if not token_data:

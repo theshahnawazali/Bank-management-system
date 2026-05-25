@@ -116,7 +116,7 @@ def get_account_handle(username):
         user_data = cursor.fetchone()
 
         cursor.execute(f"""
-            SELECT account_number, account_type, balance, status FROM accounts WHERE user_id = {user_data[1]}
+            SELECT account_number, account_type, balance, status, created_at FROM accounts WHERE user_id = {user_data[1]}
         """)
         account_data = cursor.fetchone()
 
@@ -126,6 +126,8 @@ def get_account_handle(username):
             "Account Type"      : account_data[1],
             "Account Number "   : account_data[0],
             "Account Username"  : username,
+            "Account Status"    : account_data[3],
+            "Open On"           : account_data[4]
         }
         return info
 
@@ -217,14 +219,23 @@ def update_transaction(username,amount,transaction_type,transaction_status):
     
     account = cursor.fetchone()
 
-    reference_no = generate_reference_number()
+    transaction_id = generate_reference_number()
 
     cursor.execute("""
-        INSERT INTO transactions (account_id,amount, reference_no, transaction_type, transaction_status) VALUE (%s, %s, %s, %s, %s)
-    """,(account[0],amount,reference_no,transaction_type,transaction_status))
+        INSERT INTO transactions (account_id,amount, transaction_id, transaction_type, transaction_status) VALUE (%s, %s, %s, %s, %s)
+    """,(account[0],amount,transaction_id,transaction_type,transaction_status))
 
     conn.commit()
 
+
+def get_username_via_account_number(account_number):
+    cursor.execute("""
+        SELECT users.username, accounts.account_number   FROM users JOIN accounts ON users.user_id = accounts.user_id WHERE account_number = %s;
+                   """,(account_number,))
+    
+    reciever_username = cursor.fetchone()
+
+    return reciever_username[0]
 
 # --------------- Set Account Number ----------------
 def set_account_number(username,account_number):

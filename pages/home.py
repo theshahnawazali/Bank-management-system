@@ -1,70 +1,99 @@
 import streamlit as st
 from utils import validator
 from services.bank_service import get_account
-from pages.header import render_header
+from templates import header
 from utils.verify_login import verify_login_session
-from utils.auth import load_user
+from templates import sidebar,overview
+from services.bank_service import get_account
 
 
 st.set_page_config(
     page_title="Home Page",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
-
 user = verify_login_session()
 
 if user == None:
     st.switch_page("app.py")
 
+
 # ---------------- HEADER ----------------
-render_header(user["username"])
+header.user_header("")
 
-st.title(f"Hello {user["name"]}")
+current_user = get_account(user["username"]).info
 
-st.markdown("### Our Services ")
+data = {
+    "name" : current_user["Name"],
+    "Balance" : current_user["Balance"],
+    "Account Number" : current_user["Account Number "],
+    "Account Username" : current_user["Account Username"],
+    "Account Type" : current_user["Account Type"],
+    "Open On"      : current_user["Open On"]
+}
 
-col1, col2, col3, col4, col5 = st.columns([2,2,2,2,2])
+overview.user_overview(data)
+sidebar.sidebar()
 
 
 st.markdown("""
     <style>
-    [data-testid="column"] .stButton > button {
-        height: 150px;
+    .service-box {
+        background: #161b22;
+        border: 1px solid #21262d;
+        border-radius: 14px;
+        width : 100%;
+        margin : 2px;
+        height : 180px;
+        padding : 15px;
+        display : flex;
+        flex-direction:column;
+        gap:5px;
+        }
+    .icons {
+        font-size : 30px;
+    }
+    .service-name {
+        font-size:18px;
+        font-weight:bold;
+        line-height:35px;
+        text-align : left;
+    }
+    .msg {
+        font-size : 15px;
+        color: gray;
     }
     </style>
-""", unsafe_allow_html=True)
+    """,unsafe_allow_html=True)
 
-# # ---------------- ACCOUNT INFO ----------------
-with col1:
-    st.markdown("<div class='boxes'>",unsafe_allow_html=True)
+col_withdraw, col_deposit, col_transfer, col_transaction = st.columns([2,2,2,2])
 
-    if st.button("🏦 Account\nInfo", use_container_width=True):
-        st.switch_page("pages/info.py")
+with col_withdraw:
+    st.markdown("""<div class="service-box">
+                    <span class='icons'>💸</span> 
+                    <span class='service-name'>Withdraw</span> 
+                    <span class='msg' >Withdraw your funds easily and quickly</span>
+                """,unsafe_allow_html=True)
 
-# ---------------- DEPOSIT ----------------
-with col2:
-    st.markdown("<div class='boxes'>",unsafe_allow_html=True)
+with col_deposit:
+    st.markdown("""<div class="service-box">
+                <span class='icons'>💰</span> 
+                <span class='service-name'>Deposit</span> 
+                <span class='msg' >Add funds to your account securely</span>
+                </div>""",unsafe_allow_html=True)
 
-    if st.button("💰 Deposit", use_container_width=True):
-        st.switch_page("pages/deposit.py")
+with col_transfer:
+    st.markdown("""<div class="service-box">
+                    <span class='icons'>🔄</span>
+                    <span class='service-name'>Transfer</span>
+                    <span class='msg'>Send money to other accounts instantly</span>
+                </div>""",unsafe_allow_html=True)
 
-# ---------------- WITHDRAW ----------------
-with col3:
-    st.markdown("<div class='boxes'>",unsafe_allow_html=True)
-
-    if st.button("💸 Withdraw", use_container_width=True):
-        st.switch_page("pages/withdraw.py")
-
-# ---------------- TRANSFER ----------------
-with col4:
-    st.markdown("<div class='boxes'>",unsafe_allow_html=True)
-
-    if st.button("🔄 Transfer", use_container_width=True):
-        st.switch_page("pages/transfer.py")
-
-# ---------------- TRANSACTIONS ----------------
-with col5:
-    st.markdown("<div class='boxes'>",unsafe_allow_html=True)
-
-    if st.button("📊 Transactions", use_container_width=True):
-        st.switch_page("pages/transaction.py")
+with col_transaction:
+    st.markdown("""
+                <div class="service-box">
+                    <span class='icons'>📊</span>
+                    <span class='service-name'>Transaction</span>
+                    <span class='msg'>View your recent Trasactions</span>
+                </div>
+                """,unsafe_allow_html=True)

@@ -9,6 +9,7 @@ st.set_page_config(
 
 from pages.header import render_header
 from utils.verify_login import verify_login_session
+from utils.auth import load_user
 
 
 if "user" not in st.session_state:

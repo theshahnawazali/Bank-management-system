@@ -1,8 +1,8 @@
 import streamlit as st
 from services.bank_service import Transfer
-from pages.header import render_header
-from utils.auth import load_user
+from templates import header
 from utils.verify_login import verify_login_session
+from templates import sidebar
 
 st.set_page_config(
     page_title="Transfer",
@@ -15,32 +15,77 @@ if user == None:
     st.switch_page("app.py")
 
 # ---------------- HEADER ----------------
-render_header(user["username"])
+header.user_header("Transfer")
+sidebar.sidebar()
 
 
-st.markdown("### Amount Transfer Form")
-
-with st.form("Transfer"):
-    Account_number = st.text_input("Enter Account Number",placeholder="Account Number")
-    Amount = st.text_input("Enter Amount",placeholder="Amount")
+with st.form("Deposit-form"):
+    st.markdown("""
+        <style>
+        .box {
+            display : flex;
+            flex-direction : column;
+            height : auto;
+            background: #161b22;
+            border: 1px solid #21262d;
+            border-radius: 14px;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            margin : 10px;
+        }
+        .main {
+            display: flex;
+            flex-direction: column;
+        }
+        .big-text  {
+            font-size: 1.35rem;
+            font-weight: 600;
+            color: #e6edf3;
+            margin-bottom: 3px;
+            letter-spacing: 0.05em;
+        }
+        .small-text {
+            font-size : 15px;
+            color : grey; 
+        }
+        .custom-btn div.stButton > button {
+            
+        }
+        </style>
+        <div class='box'>
+            <span class='big-text'>Transfer Funds</span>
+            <span class='small-text'>Tranfer your money safe and securely</span>
+        </div>
+    """,unsafe_allow_html=True)
+    account_number = st.text_input("Enter Account Number",placeholder="Account Number")
+    amount = st.text_input("Enter Amount:",placeholder="Amount")
     btn = st.form_submit_button("Transfer")
 
-if btn:
-    try:
-        Amount = float(Amount)
+    if btn:
+        try:
+            if account_number == "" or amount == "":
+                st.error("Enter Account Number and Amount")
+                st.stop()
 
-        if Amount <= 0:
-            st.error("Amount should be greater then 0")
-            st.stop()
+            amount = float(amount)
 
-        status = Transfer(user["username"],Amount,Account_number)
+            if len(account_number) != 12:
+                st.error("Enter Valid Account Number")
+                st.stop()
+
+            if amount <= 0:
+                st.error("Enter Amount Greater then 0")
+                st.stop()
+
+            status = Transfer(user["username"],amount,account_number)
         
 
-        if status.transfer:
-            st.success("Amount Transfer Successfull")
-            st.switch_page("pages/home.py")
-        else:
-            st.error("Insufficient Amount")
-    
-    except ValueError:
-        st.error("Amount should be in Number Only")
+            if status.transfer:
+                st.success("Amount Transfer Successfull")
+                st.switch_page("pages/home.py")
+            else:
+                st.error("Insufficient Amount")
+            
+
+        except ValueError:
+            st.error("Enter Number Only")

@@ -39,15 +39,15 @@ cursor.execute("""
 
 cursor.execute("""
     CREATE TABLE IF NOT EXISTS transactions (
-               transaction_id INT PRIMARY KEY AUTO_INCREMENT,
+               id INT PRIMARY KEY AUTO_INCREMENT,
                account_id INT,
                FOREIGN KEY (account_id) REFERENCES accounts(account_id)
                     ON UPDATE CASCADE
                     ON DELETE SET NULL,
                
                amount DECIMAL(12,2),
-               reference_no VARCHAR(50) UNIQUE,
-               transaction_type ENUM('Deposits','Withdraw','Transfer'),
+               transaction_id VARCHAR(50) UNIQUE,
+               transaction_type ENUM('Deposits','Withdraw','Transfer','Recieved'),
                transaction_date DATETIME DEFAULT CURRENT_TIMESTAMP,
                transaction_status ENUM('Success','Pending','Failed'),
                description TEXT NULL

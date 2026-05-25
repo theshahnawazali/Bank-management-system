@@ -10,12 +10,12 @@ st.set_page_config(page_title="Login", layout="wide")
 
 current_user = load_user()
 
-# user = verify_login_session()
+user = verify_login_session()
 
-# if user == None:
-#     pass
-# else:
-#     st.switch_page("pages/home.py")
+if user == None:
+    pass
+else:
+    st.switch_page("pages/home.py")
 
 render_header(current_user)
 
