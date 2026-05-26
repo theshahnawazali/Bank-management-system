@@ -26,8 +26,3 @@ class saving_account(Account):
         self.__balance = balance
         self.account_type = account_type
         self.account_number = account_number
-        
-        # set_account_number(self.username,self.account_number)
-        # create_account_handle(self.user_id,self.account_number,"Saving Account",self.__balance,"Active")
-
-

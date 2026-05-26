@@ -3,8 +3,6 @@
 # Handles transaction logging (time, type, amount, balance)
 # =========================================================
 
-import os
-import json
 from datetime import datetime
 from utils.file_handler import update_transaction, get_username_via_account_number
 

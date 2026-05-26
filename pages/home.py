@@ -1,5 +1,4 @@
 import streamlit as st
-from utils import validator
 from services.bank_service import get_account
 from templates import header
 from utils.verify_login import verify_login_session

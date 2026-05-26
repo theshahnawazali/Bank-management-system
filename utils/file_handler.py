@@ -280,5 +280,3 @@ def transfer_handle(username,value,account_number):
         return True
     
     return False
-
-    #             Transaction(account_number,f"Credited from {acc_no}", value,balance)

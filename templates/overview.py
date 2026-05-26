@@ -1,11 +1,5 @@
 import streamlit as st
 
-# st.set_page_config(
-#     page_title="BankCore - Account Overview",
-#     layout="wide",
-#     initial_sidebar_state="collapsed"
-# )
-
 def user_overview(data):
     """Renders the main user overview page with account info and services."""
 

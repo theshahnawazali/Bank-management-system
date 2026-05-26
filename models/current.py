@@ -26,6 +26,3 @@ class Current_account(Account):
         self.account_type = account_type
         self.name = name
         self.account_number = account_number
-
-        # set_account_number(self.username,self.account_number)
-        # create_account_handle(self.user_id,self.account_number,"Current Account",self.__balance,"Active")

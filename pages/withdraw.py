@@ -1,6 +1,5 @@
 import streamlit as st
 from services.bank_service import Withdraw
-from pages.header import render_header
 from utils.verify_login import verify_login_session
 from templates import sidebar,header
 

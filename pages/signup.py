@@ -6,7 +6,6 @@ from models.saving import saving_account
 from models.current import Current_account
 from pages.header import render_header
 from utils.login import update_login_info
-from utils.token import generate_session_token
 from utils.verify_login import verify_login_session
 
 
