@@ -19,7 +19,7 @@ if user == None:
 
 
 # ---------------- HEADER ----------------
-header.user_header("")
+header.user_header("",user["name"])
 
 current_user = get_account(user["username"]).info
 

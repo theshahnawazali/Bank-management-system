@@ -15,7 +15,7 @@ if user == None:
     st.switch_page("app.py")
 
 # ---------------- HEADER ----------------
-header.user_header("Transfer")
+header.user_header("Transfer",user["name"])
 sidebar.sidebar()
 
 

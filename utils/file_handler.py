@@ -183,28 +183,24 @@ def deposit_handle(username,value):
 
 # --------------- Transaction Handler ----------------
 def transaction_handler(username):
-    # Check if user file exists
-    if os.path.exists("data/user.json"):
-        with open("data/user.json", "r") as f:
-            data = json.load(f)
+    cursor.execute(f"""
+        SELECT 
+            transactions.transaction_id, 
+            transactions.transaction_type, 
+            transactions.transaction_date,
+            transactions.amount,
+            transactions.transaction_status
+        FROM users
+        JOIN accounts 
+            ON users.user_id = accounts.user_id
+        JOIN transactions 
+            ON transactions.account_id = accounts.account_id
+        WHERE username = '{username}';
+    """)
 
-            # Find matching user
-            for user in data:
-                if username in user:
-                    acc_no = str(user[username]["Account Number"])
-
-        
-    if os.path.exists("data/account.json"):
-        with open("data/account.json", "r") as f:
-            data = json.load(f)
-
+    data = cursor.fetchall()
+    
     return data
-
-        # Print transaction list
-        # for user in data:
-        #     if acc_no in user:
-        #         for trans in user[acc_no]["Transaction"]:
-        #             print(trans)
 
 def update_transaction(username,amount,transaction_type,transaction_status):
     cursor.execute("""

@@ -17,7 +17,7 @@ if user == None:
 # ---------------- HEADER ----------------
 
 sidebar.sidebar()
-header.user_header("Withdraw")
+header.user_header("Withdraw",user["name"])
 
 
 with st.form("Withdrawal-form"):

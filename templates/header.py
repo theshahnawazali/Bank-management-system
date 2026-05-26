@@ -1,6 +1,6 @@
 import streamlit as st
 from utils.auth import logout_user
-def user_header(page):
+def user_header(page,name):
     st.markdown("""
         <style>
         html, body, .stApp {
@@ -38,7 +38,7 @@ def user_header(page):
     with col_user:
         st.markdown(f"""
         <div class='wlc-msg'>
-            <span class='user-title'>Hello Shahnawaz Ali 👋</span>
+            <span class='user-title'>Hello {name} 👋</span>
             <span class='address'>Dashboard > {page}</span>
         </div>
         """, unsafe_allow_html=True)

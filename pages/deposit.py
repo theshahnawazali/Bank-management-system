@@ -17,7 +17,7 @@ if user == None:
     st.switch_page("app.py")
 
 # # ---------------- HEADER ----------------
-header.user_header("Deposit")
+header.user_header("Deposit",user["name"])
 sidebar.sidebar()
 
 with st.form("Deposit-form"):

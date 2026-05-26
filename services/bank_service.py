@@ -94,7 +94,7 @@ class Transactions:
         self.transaction()
 
     def transaction(self):
-        self.trans = file_handler.transaction_handler(self.account_username)
+        self.data = file_handler.transaction_handler(self.account_username)
         
         
 
