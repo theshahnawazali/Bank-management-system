@@ -169,7 +169,7 @@ pip freeze > requirements.txt
 ## Run the Application
 
 ```bash
-streamlit run main.py
+streamlit run app.py
 ```
 
 ---

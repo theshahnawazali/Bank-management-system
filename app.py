@@ -109,7 +109,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run Application
-streamlit run main.py
+streamlit run app.py
 """, language="bash")
 
 st.divider()
