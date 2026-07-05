@@ -1,0 +1,1 @@
+DATABASE_URL = "mysql+pymysql://root:password@localhost/Bankdb"
