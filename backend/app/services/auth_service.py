@@ -10,23 +10,24 @@ class UserService:
             email : str,
             username : str,
             password : str,
+            role : str = "Customer"
             # db 
     ):
-        user_username = db.query(User).filter(User.email == email).first()
-        user_email = db.query(User).filter(User.username == username).first()
+        UserEmail = db.query(User).filter(User.email == email).first()
+        UserUsername = db.query(User).filter(User.username == username).first()
 
-        # Check unique Username
-        if user_username:
+        # Check unique Email
+        if UserEmail:
             return {
-                "Status" : False,
+                "status" : False,
                 "message" : "Email already exits."
             }
         
         else:
-            # Check Unique Email
-            if user_email:
+            # Check Unique Username
+            if UserUsername:
                 return {
-                    "Status" : False,
+                    "status" : False,
                     "message" : "Username already exits."
                 }
             
@@ -35,14 +36,15 @@ class UserService:
                 user = User(
                     username = username,
                     email = email,
-                    password = hash_password(password)
+                    password = hash_password(password),
+                    role = role
                 )
 
                 db.add(user)
                 db.commit()
 
                 return {
-                    "Status" : True,
+                    "status" : True,
                     "message" : "Account Created Successfully."
                 }
 
@@ -66,7 +68,6 @@ class UserService:
                     "message" : "Incorrect Password"
                 }
             
-
         else:
             return {
                 "status" : False,

@@ -9,17 +9,19 @@ from enums import TransactionStatus, TransactionType
 class Transaction(Base):
     __tablename__ = "transactions"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id : Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
 
-    account_id = Column(
+    account_id : Mapped[int] = mapped_column(
         Integer,
-        ForeignKey("accounts.account_id"),
+        ForeignKey(
+            "accounts.account_id"
+        ),
         nullable=False
     )
 
-    amount = Column(Float, nullable=False)
-    transaction_id = Column(String(100), nullable=False, unique=True)
-    transaction_type = Column(SQLEnum(TransactionType), nullable=False)
-    date = Column(DateTime(timezone=True), server_default=func.now())
-    status = Column(SQLEnum(TransactionStatus), nullable=False)
-    description = Column(String(255), nullable=True)
+    amount : Mapped[float] = mapped_column(Float,nullable=False)
+    transaction_id : Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    transaction_type : Mapped[str] = mapped_column(SQLEnum(TransactionType),nullable=False)
+    date : Mapped[DateTime] = mapped_column(DateTime(timezone=True),server_default=func.now(),nullable=False)
+    status : Mapped[str] = mapped_column(SQLEnum(TransactionStatus),nullable=False)
+    description : Mapped[str] = mapped_column(String(255),nullable=True)

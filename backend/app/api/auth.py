@@ -6,31 +6,63 @@ from services.auth_service import UserService
 
 router = APIRouter()
 
+# ==================== POST Method for user Register ====================
 @router.post('/register')
 async def RegisterUser(
     user : UserRegister,
     name : str,
     email : EmailStr,
     username : str,
-    password : str
+    password : str,
+    role : str = "Customer"
 
 ):
-    return UserService.Register(
+    res = UserService.Register(
         name,
         email,
         username,
-        password
-    ), user
+        password,
+        role
+    )
 
+    if res["status"]:
+        return {
+            "status" : res["status"],
+            "message" : res["message"],
+            "data" : user
+        }
+    
+    else:
+        return {
+            "status" : res["status"],
+            "message" : res["message"],
+            "data" : user
+        }
+
+
+
+# ================= POST Method for user Login =======================
 @router.post("/login")
 async def userlogin(
     user : UserRegister,
     username : str,
     password : str
 ):
-    status = UserService.Login(
+    res = UserService.Login(
         username,
         password
     )
 
-    return status, user
+    if res["status"] == False:
+        return {
+            "status" : res["status"],
+            "message" : res["message"],
+            "data" : user
+        }
+    
+    else:
+        return {
+            "status" : res["status"],
+            "message" : res["message"],
+            "data" : user
+        }

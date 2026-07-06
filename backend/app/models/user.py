@@ -1,14 +1,16 @@
 from database.base import Base
-from sqlalchemy import Column, Integer, String, DateTime
+from enums import UserRole
+from sqlalchemy import Column, Integer, String, DateTime, Enum
 from sqlalchemy.sql import func
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 class User(Base):
     __tablename__ = "users"
 
-    user_id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(100), unique=True, nullable=False)
-    email = Column(String(255), unique=True, nullable= False)
-    password = Column(String(255), unique=False, nullable=False)
-    role = Column(String(20), default="customer")
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    user_id : Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    username : Mapped[int] = mapped_column(String(50), unique=True, nullable=False)
+    email : Mapped[str] = mapped_column(String(100),unique=True, nullable=False)
+    password : Mapped[str] = mapped_column(String(100),nullable=False)
+    role : Mapped[str] = mapped_column(Enum(UserRole), nullable=False)
+    created_at : Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now()) 
