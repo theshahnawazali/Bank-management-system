@@ -1,10 +1,11 @@
 from database.connection import Session
 from models.user import User
-from utils.hash import hash_password, verify_password
+from utils.security import hash_password, verify_password
 
 db = Session() # Will be removed when include fast api
 
 class UserService:
+    @staticmethod
     def Register(
             name : str,
             email : str,
@@ -20,7 +21,8 @@ class UserService:
         if UserEmail:
             return {
                 "status" : False,
-                "message" : "Email already exits."
+                "message" : "Email already exits.",
+                "role" : None
             }
         
         else:
@@ -28,12 +30,14 @@ class UserService:
             if UserUsername:
                 return {
                     "status" : False,
-                    "message" : "Username already exits."
+                    "message" : "Username already exits.",
+                    "role" : None
                 }
             
             else:
                 # Create User and add
                 user = User(
+                    name = name,
                     username = username,
                     email = email,
                     password = hash_password(password),
@@ -45,9 +49,11 @@ class UserService:
 
                 return {
                     "status" : True,
-                    "message" : "Account Created Successfully."
+                    "message" : "Account Created Successfully.",
+                    "role" : role
                 }
-
+            
+    @staticmethod
     def Login(
             username : str,
             password : str
@@ -59,22 +65,30 @@ class UserService:
             if verify_password(password, UserUsername.password):
                 return {
                     "status" : True,
-                    "message" : "Login Successfull"
+                    "message" : "Login Successfull",
+                    "role" : UserUsername.role
                 }
             
             else:
                 return {
                     "status" : False,
-                    "message" : "Incorrect Password"
+                    "message" : "Incorrect Password",
+                    "role" : None
                 }
             
         else:
             return {
                 "status" : False,
-                "message" : "Username does not exits"
+                "message" : "Username does not exits",
+                "role" : None
             }
 
     def Logout(
+            username : str
+    ):
+        pass
+
+    def have_logged_in(
             username : str
     ):
         pass

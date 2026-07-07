@@ -1,5 +1,6 @@
 import random
 import secrets
+import uuid
 from datetime import datetime
 from database.connection import Session
 from models.account import Account
@@ -22,15 +23,12 @@ def generate_account_number():
 
 # Generates Reference number and ensure it is unique
 def generate_reference_number():
-    
-    date_part = datetime.now().strftime("%Y%m%d")
-    random_part = secrets.randbelow(9000) + 1000
-    reference_no = f"TXN{date_part}{random_part}"
+    transaction_id = "TXN" + uuid.uuid4().hex[:16].upper()
 
-    unique = db.query(Transaction).filter(Transaction.transaction_id == reference_no).first()
+    unique = db.query(Transaction).filter(Transaction.transaction_id == transaction_id).first()
 
-    if unique:
-        return reference_no
+    if unique == None:
+        return transaction_id
     else:
         generate_reference_number()
     

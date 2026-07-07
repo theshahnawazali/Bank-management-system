@@ -1,100 +1,43 @@
-# from fastapi import FastAPI
-
-# router = FastAPI()
-
-# @router.get('/')
-# async def root():
-#     return {"Msg" : True}
-
-
-
-# from models.account import Account
-# from models.account import Account
-from database.base import Base
-from models.account import Account
-from models.transaction import Transaction
-from models.user import User
-from models.sessions import Session
-from database.connection import engine, Session
-
-from database.dependencies import get_db
-
-session = Session()
-
-
-Base.metadata.create_all(bind=engine)
-
-# user = session.query(User).all()
-
-# for u in user:
-#     print(u.user_id, u.email)
-
-from services.auth_service import UserService
-
-
-
-# result = UserService.Register(
-#     "shahnawaz ali",
-#     "gsfjg",
-#     "jsf",
-#     "jfsgja"
-# )
-
 from services.bank_service import BankService
 
-# result = BankService.create_account(
-#     1,
-#     "current",
-#     120.25,
-#     "active"
-# ) 
-
-# result = UserService.Login(
-#     "shahnawaz",
-#     '123456'
-# )
-
-# print(result)
-
-
 # print(
-#     BankService.create_account(
-#         "jsf",
-#         "Current",
-#         122.20,
-#         "Active"
-#     )
-# )
-# print(
-#     UserService.Register(
-#         "Shahnawaz Ali",
-#         "theshahnawazali@gmail.com",
-#         "shahnawazali",
-#         "Shahnawaz"
+#     BankService.deposit(
+#         787105308887,
+#         500.10
 #     )
 # )
 
 # print(
-#     BankService.create_account(
-#         "shahnawazali",
-#         "Saving",
-#         500.00,
-#         "Active"
+#     BankService.withdraw(
+#         787105308887,
+#         500
 #     )
 # )
 
 # print(
-#     BankService.get_current_user(
-#         295768493905
+#     BankService.update_transaction(
+#         787105308887,
+#         100.23,
+#         "Withdraw",
+#         "TXN2026070616086",
+#         "Success"
+#     )
+# )
+
+# print(
+#     BankService.get_username_by_account_number(
+#         787105308887
 #     )
 # )
 
 
 
 
-
-
-
+# print(
+#     BankService.get_balance(
+#         787105308887
+#     )
+# )
 
 
 
@@ -108,6 +51,15 @@ from api.bank import router as bank_router
 
 Base.metadata.create_all(engine)
 
+# print(
+res = BankService.get_transaction_history(
+        787105308887
+    )
+# )
+
+print(res)
+res = list(res)
+print(type(res))
 app = FastAPI()
 
 app.include_router(user_router)

@@ -1,10 +1,10 @@
 import streamlit as st
-from backend.app.utils import hash
-from backend.app.utils import validator
+from core import security
+from utils import validator
 from backend.pages.header import render_header
-from backend.app.utils.auth import load_user,login_handle
-from backend.app.utils.login import update_login_info
-from backend.app.utils.verify_login import verify_login_session
+from utils.auth import load_user,login_handle
+from utils.login import update_login_info
+from utils.verify_login import verify_login_session
 
 st.set_page_config(page_title="Login", layout="wide")
 
@@ -53,7 +53,7 @@ if button:
                 st.stop()
 
             else: 
-                verify_password = hash.verify_password(
+                verify_password = security.verify_password(
                     password,
                     user[0]
                     )

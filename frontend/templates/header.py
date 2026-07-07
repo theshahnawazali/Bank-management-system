@@ -1,5 +1,5 @@
 import streamlit as st
-from backend.app.utils.auth import logout_user
+from utils.auth import logout_user
 def user_header(page,name):
     st.markdown("""
         <style>

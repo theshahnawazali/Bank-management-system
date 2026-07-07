@@ -1,47 +1,96 @@
 from fastapi import APIRouter
 from database.dependencies import get_db
-from schemas.account import UserAccountDetails
+from schemas.account import UserAccountDetails, UserUpdateBalance
 from services.bank_service import BankService
 
 router = APIRouter()
 
-@router.post('/account')
+@router.post('/account/create')
 async def create_account(
-    user : UserAccountDetails,
-    username : str,
-    account_type : str,
-    balance : float,
-    status : str
+    data : UserAccountDetails,
 ):
     res = BankService.create_account(
-        username,
-        account_type,
-        balance,
-        status
+        data.username,
+        data.account_type,
+        data.balance,
+        data.status
     )
 
-    return res, user
+    # return data
+    if res["status"]:
+        return {
+            "status" : res['status'],
+            "message" : res['message'],
+            "data" : data
+        }
+    
+    else:
+        return {
+            "status" : res['status'],
+            "message" : res['message'],
+            "data" : data
+        }
 
-@router.get('/balance')
-async def get_balance(
-    account_number : int
+@router.get('/account/{AccountNumber}')
+async def get_account_details(
+    AccountNumber : int
 ):
-    res = BankService.get_balance(account_number)
+    result = BankService.get_account_details(
+        AccountNumber
+    )
 
+    return {
+        "name": result.name,
+        "username": result.username,
+        "email": result.email,
+        "balance": result.balance,
+        "account_status": result.status,
+        "account_created_at": result.created_at,
+        "account_type": result.account_type,
+    }
+
+@router.get('/balance/{AccountNumber}')
+async def Balance(AccountNumber : int):
+    res = BankService.get_balance({AccountNumber})
     return res
 
-@router.post('/deposit')
-async def deposit(
-    account_number : int,
-    amount : int
+@router.post('/balance/{Transaction_type}')
+async def balance(
+    data : UserUpdateBalance,
+    Transaction_type : str
 ):
-    pass
+    method_list = ['deposit', 'withdraw', 'transfer']
+    if Transaction_type in method_list:
+        res = BankService.UpdateBalance(
+            data.sender_account_number,
+            data.amount,
+            Transaction_type,
+            data._account_number
+        )
+        return {
+            "status" : res['status'],
+            "balance" : res['Balance'],
+            "transaction id" : res['transaction id'],
+            "message" : res["message"]
+        }
+    
+    else:
+        return {
+            "status" : False,
+            "balance" : None,
+            "transaction id" : None,
+            "message" : "Invalid method"
+        }
 
-@router.post('/trasaction/update')
-async def upadate_trasaction(
-    account_number : int,
-    amount : float,
-    transaction_type : str,
-    status : str
-):
-    pass
+
+# to be added soon
+@router.get('/transaction/{AccountNumber}')
+async def transaction(AccountNumber : int):
+    res = BankService.get_transaction_history(AccountNumber)
+    # return {
+    #     "status" : res["status"],
+    #     "message" : res["message"],
+    #     "trasactions" : res["trasactions"]
+    # }
+
+    return res

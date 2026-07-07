@@ -1,4 +1,4 @@
-from backend.app.utils.auth import load_user,get_user_token, get_user_name,get_user_username
+from utils.auth import load_user,get_user_token, get_user_name,get_user_username
 
 
 def verify_login_session():

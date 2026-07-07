@@ -1,13 +1,13 @@
 import streamlit as st
-from backend.app.utils import generator
-from backend.app.utils import validator
-from backend.app.services.auth_service import Signup
-from backend.app.utils.hash import hash_password
+from utils import id_generator
+from utils import validator
+from services.auth_service import Signup
+from core.security import hash_password
 from backend.models.saving import saving_account 
 from backend.models.current import Current_account
 from backend.pages.header import render_header
-from backend.app.utils.login import update_login_info
-from backend.app.utils.verify_login import verify_login_session
+from utils.login import update_login_info
+from utils.verify_login import verify_login_session
 
 
 user = verify_login_session()
@@ -51,13 +51,13 @@ if Button:
     if validator.validate_name(name):
         if validator.validate_username(username):
             username = username.lower().strip()
-            unique_username = generator.check_username(username)
+            unique_username = id_generator.check_username(username)
             if unique_username:
                 if validator.validate_password(password):
                     secured_password = hash_password(password)
                     
                     if validator.validate_account_type(account_type):
-                        account_number = generator.generate_acc()
+                        account_number = id_generator.generate_acc()
                         
                         if validator.validate_initial_balance(int(initial_amount)):
                             user_id = Signup(

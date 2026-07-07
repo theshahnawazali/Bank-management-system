@@ -10,6 +10,7 @@ class TransactionType(str, PyEnum):
     DEPOSIT = "Deposit"
     WITHDRAW = "Withdraw"
     TRANSFER = "Transfer"
+    RECIEVE = "Recieve"
 
 class UserRole(str, PyEnum):
     CUSTOMER = "Customer"

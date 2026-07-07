@@ -20,7 +20,7 @@ class Transaction(Base):
     )
 
     amount : Mapped[float] = mapped_column(Float,nullable=False)
-    transaction_id : Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
+    transaction_id : Mapped[str] = mapped_column(String(255),nullable=False)
     transaction_type : Mapped[str] = mapped_column(SQLEnum(TransactionType),nullable=False)
     date : Mapped[DateTime] = mapped_column(DateTime(timezone=True),server_default=func.now(),nullable=False)
     status : Mapped[str] = mapped_column(SQLEnum(TransactionStatus),nullable=False)

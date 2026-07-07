@@ -5,8 +5,8 @@
 
 import os
 import json
-from backend.app.utils.generator import generate_reference_number
-from backend.app.data.db import cursor, conn
+from utils.id_generator import generate_reference_number
+from data.db import cursor, conn
 
 # --------------- Signup Handler ----------------
 def signup_handle(username,name,password):
@@ -229,9 +229,9 @@ def get_username_via_account_number(account_number):
         SELECT users.username, accounts.account_number   FROM users JOIN accounts ON users.user_id = accounts.user_id WHERE account_number = %s;
                    """,(account_number,))
     
-    reciever_username = cursor.fetchone()
+    _username = cursor.fetchone()
 
-    return reciever_username[0]
+    return _username[0]
 
 # --------------- Set Account Number ----------------
 def set_account_number(username,account_number):

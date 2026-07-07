@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from schemas.auth import UserRegister
+from schemas.auth import UserRegister, UserLogin
 from database.dependencies import get_db
 from pydantic import EmailStr
 from services.auth_service import UserService
@@ -9,60 +9,54 @@ router = APIRouter()
 # ==================== POST Method for user Register ====================
 @router.post('/register')
 async def RegisterUser(
-    user : UserRegister,
-    name : str,
-    email : EmailStr,
-    username : str,
-    password : str,
-    role : str = "Customer"
-
+    data : UserRegister
 ):
     res = UserService.Register(
-        name,
-        email,
-        username,
-        password,
-        role
+        data.name,
+        data.email,
+        data.username,
+        data.password,
+        data.role
     )
 
     if res["status"]:
         return {
             "status" : res["status"],
             "message" : res["message"],
-            "data" : user
+            "role" : data.role,
+            "data" : data
         }
     
     else:
         return {
             "status" : res["status"],
             "message" : res["message"],
-            "data" : user
+            "data" : data
         }
-
 
 
 # ================= POST Method for user Login =======================
 @router.post("/login")
 async def userlogin(
-    user : UserRegister,
-    username : str,
-    password : str
+    data : UserLogin
 ):
     res = UserService.Login(
-        username,
-        password
+        data.username,
+        data.password
     )
 
     if res["status"] == False:
         return {
             "status" : res["status"],
             "message" : res["message"],
-            "data" : user
+            "role" : res["role"],
+            "data" : data
         }
     
     else:
         return {
             "status" : res["status"],
             "message" : res["message"],
-            "data" : user
+            "role" : res["role"],
+            "data" : data
         }

@@ -1,10 +1,10 @@
-from backend.app.utils.auth import (
+from utils.auth import (
     get_user_id,
     delete_sessions,
     login_user,
     session_login
 )
-from backend.app.utils.token import generate_session_token
+from utils.token import generate_session_token
 
 
 def update_login_info(username):

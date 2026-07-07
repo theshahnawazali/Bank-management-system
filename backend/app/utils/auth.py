@@ -2,7 +2,7 @@
 
 import streamlit as st
 import extra_streamlit_components as stx
-from backend.app.data.db import cursor, conn
+from data.db import cursor, conn
 
 cookie_manager = stx.CookieManager()
 
