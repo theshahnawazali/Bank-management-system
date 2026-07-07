@@ -2,7 +2,7 @@ from models.user import User
 from sqlalchemy import select
 from models.account import Account
 from models.transaction import Transaction
-from utils.id_generator import generate_account_number, generate_reference_number
+from receiverutils.id_generator import generate_account_number, generate_reference_number
 from datetime import datetime
 from core.config import DAILY_LIMIT
 
@@ -77,13 +77,13 @@ class BankService:
         sendar_account_number : int,
         amount : int,
         transaction_type : str,
-        _account_number : int = None,
+        receiver_account_number : int = None,
     ):
         cls.__sender_account_number = sendar_account_number
-        cls.___account_number = _account_number
+        cls.__receiver_account_number = receiver_account_number
         cls.__amount = amount
         sender = cls.get_current_user(cls.__sender_account_number)
-         = cls.get_current_user(cls.___account_number)
+        receiver = cls.get_current_user(cls.__receiver_account_number)
         transaction_id = generate_reference_number()
 
         # Check user login
@@ -165,7 +165,7 @@ class BankService:
                 if cls.get_user_withdrawal_limit(cls.__sender_account_number):
 
                     # Check Reciever account exist
-                    if cls.check_user_exits(cls.___account_number):
+                    if cls.check_user_exits(cls.__receiver_account_number):
 
                         # Check account status
                         if cls.check_account_status(cls.__sender_account_number):
@@ -201,7 +201,7 @@ class BankService:
                             "status" : False,
                             "Balance" : None,
                             "transaction id" : None,
-                            "message" : " account does not exit",
+                            "message" : "receiver account does not exit",
                         }
 
                 else:
@@ -217,10 +217,10 @@ class BankService:
 
             
             # Check reciever account exit or not
-            if cls.check_user_exits(cls.___account_number):
+            if cls.check_user_exits(cls.__receiver_account_number):
 
-                # Check whether sender and  are not same
-                if cls.__sender_account_number == cls.___account_number:
+                # Check whether sender and receiver are not same
+                if cls.__sender_account_number == cls.__receiver_account_number:
                     return {
                         "status" : False,
                         "Balance" : sender.balance,
@@ -228,8 +228,8 @@ class BankService:
                         "message" : "Can not Tranfer to same account"
                     }
                 
-                # Check sender and  are same or not
-                if cls.__sender_account_number == cls.___account_number:
+                # Check sender and receiver are same or not
+                if cls.__sender_account_number == cls.__receiver_account_number:
                     return {
                         "status" : False,
                         "Balance" : sender.balance,
@@ -254,7 +254,7 @@ class BankService:
                     }
                 else:
                     sender.balance -= cls.__amount
-                    .balance += cls.__amount
+                    receiver.balance += cls.__amount
 
                     cls.update_transaction(
                         cls.__sender_account_number,
@@ -267,7 +267,7 @@ class BankService:
                     db.commit()
 
                     cls.update_transaction(
-                        cls.___account_number,
+                        cls.__receiver_account_number,
                         cls.__amount,
                         "Recieve",
                         transaction_id,
@@ -285,7 +285,7 @@ class BankService:
                     "status" : False,
                     "Balance" : None,
                     "transaction id" : None,
-                    "message" : " Account does not exists."
+                    "message" : "Receiver Account does not exists."
                 }
             
         
