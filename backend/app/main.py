@@ -1,65 +1,22 @@
-from services.bank_service import BankService
-
-# print(
-#     BankService.deposit(
-#         787105308887,
-#         500.10
-#     )
-# )
-
-# print(
-#     BankService.withdraw(
-#         787105308887,
-#         500
-#     )
-# )
-
-# print(
-#     BankService.update_transaction(
-#         787105308887,
-#         100.23,
-#         "Withdraw",
-#         "TXN2026070616086",
-#         "Success"
-#     )
-# )
-
-# print(
-#     BankService.get_username_by_account_number(
-#         787105308887
-#     )
-# )
-
-
-
-
-# print(
-#     BankService.get_balance(
-#         787105308887
-#     )
-# )
-
-
-
 # All Import Code are Here
-
-from database.connection import Session, engine
+from database.connection import SessionLocal, engine
 from database.base import Base
+from models.account import Account
+from models.requests import Request
+from models.transaction import Transaction
+from models.user import User
 from fastapi import FastAPI
 from api.auth import router as user_router
 from api.bank import router as bank_router
 
+
+from services.bank_service import BankService
+from services.admin_service import AdminService
+from services.auth_service import AuthService
+
 Base.metadata.create_all(engine)
 
-# print(
-res = BankService.get_transaction_history(
-        787105308887
-    )
-# )
 
-print(res)
-res = list(res)
-print(type(res))
 app = FastAPI()
 
 app.include_router(user_router)
@@ -71,3 +28,47 @@ async def root():
         "message" : "Hello World"
     }
 
+
+from utils.id_generator import generate_otp
+
+# print(generate_otp())
+
+# print(
+#     AuthService.create_and_send_otp("shahnawazali")
+# )
+
+# print(
+#     AuthService.verify_otp(
+#         "shahnawazali",
+#         352338
+#     )
+# )
+import time 
+start = time.time()
+
+# print(
+#     AuthService.register(
+#         "Shahnawaz Ali",
+#         "shahnawaz@gmail.com",
+#         "shahnawaz",
+#         "password"
+#     )
+# )
+
+print(
+    # AuthService.verify_register_otp(
+    #     "shahnawaz",
+    #     "123456"
+    # )
+
+    AuthService.register(
+        "Shahnawaz Ali",
+        "shahnawazali@gmail.com",
+        "shahnawaz",
+        "password"
+    )
+)
+
+end = time.time()
+
+print(end - start)

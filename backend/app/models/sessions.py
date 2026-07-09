@@ -6,7 +6,7 @@ from sqlalchemy import Enum as SQLEnum
 from enums import SessionStatus
 
 
-class Session(Base):
+class SessionLocal(Base):
     __tablename__ = "sessions"
 
     session_id : Mapped[int] = mapped_column(Integer, primary_key=True,index=True)

@@ -1,6 +1,6 @@
 from database.base import Base
 from enums import UserRole
-from sqlalchemy import Column, Integer, String, DateTime, Enum
+from sqlalchemy import Column, Integer, String, DateTime, Enum, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -14,4 +14,5 @@ class User(Base):
     email : Mapped[str] = mapped_column(String(100),unique=True, nullable=False)
     password : Mapped[str] = mapped_column(String(100),nullable=False)
     role : Mapped[str] = mapped_column(Enum(UserRole), nullable=False)
+    is_varified : Mapped[str] = mapped_column(Boolean, nullable=False)
     created_at : Mapped[DateTime] = mapped_column(DateTime(timezone=True), server_default=func.now()) 

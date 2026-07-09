@@ -1,0 +1,9 @@
+services:
+  fastapi:
+    image: python:3.13.9
+    working_dir: /backend/app
+    volumes:
+      - .:app
+    command: sh -c "pip install -r requirement.txt && fastapi dev"
+    ports:
+      - "5173:5173"

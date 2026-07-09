@@ -49,10 +49,11 @@ async def get_account_details(
         "account_type": result.account_type,
     }
 
-@router.get('/balance/{AccountNumber}')
-async def Balance(AccountNumber : int):
-    res = BankService.get_balance({AccountNumber})
+@router.get('/balance/{AccountID}')
+async def Balance(AccountID : int):
+    res = BankService.get_balance({AccountID})
     return res
+
 
 @router.post('/balance/{Transaction_type}')
 async def balance(
@@ -65,7 +66,7 @@ async def balance(
             data.sender_account_number,
             data.amount,
             Transaction_type,
-            data._account_number
+            data.receiver_account_number
         )
         return {
             "status" : res['status'],

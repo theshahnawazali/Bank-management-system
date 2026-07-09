@@ -2,11 +2,12 @@ import random
 import secrets
 import uuid
 from datetime import datetime
-from database.connection import Session
+from database.connection import SessionLocal
 from models.account import Account
 from models.transaction import Transaction
+import secrets
 
-db = Session()
+db = SessionLocal()
 
 # Generate a unique account number and verify it is unique
 
@@ -32,3 +33,8 @@ def generate_reference_number():
     else:
         generate_reference_number()
     
+def generate_token():
+    return secrets.token_hex(10)
+
+def generate_otp():
+    return random.randint(100000, 999999)

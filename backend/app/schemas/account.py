@@ -10,4 +10,4 @@ class UserUpdateBalance(BaseModel):
     sender_account_number : int
     amount : float
     transaction_type : str
-    _account_number : int = None
+    receiver_account_number : int = None

@@ -19,7 +19,6 @@ class UserRole(str, PyEnum):
 class AccountStatus(str, PyEnum):
     ACTIVE = "Active"
     CLOSED = "Closed"
-    INACTIVE = "Inactive"
     FROZEN = "Frozen"
 
 
@@ -31,3 +30,7 @@ class TransactionStatus(str, PyEnum):
 class SessionStatus(str, PyEnum):
     ACTIVE = "Active"
     DEACTIVE = "Deactive"
+
+class RequestStatus(str, PyEnum):
+    COMPLETED = "Completed"
+    PENDING = "Pending"

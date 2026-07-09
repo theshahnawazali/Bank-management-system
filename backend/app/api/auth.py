@@ -1,17 +1,17 @@
 from fastapi import APIRouter
-from schemas.auth import UserRegister, UserLogin
+from schemas.auth import UserRegister, UserLogin, AuthToken
 from database.dependencies import get_db
 from pydantic import EmailStr
-from services.auth_service import UserService
+from services.auth_service import AuthService
 
 router = APIRouter()
 
-# ==================== POST Method for user Register ====================
+# ==================== POST Method for user register ====================
 @router.post('/register')
 async def RegisterUser(
     data : UserRegister
 ):
-    res = UserService.Register(
+    res = AuthService.register(
         data.name,
         data.email,
         data.username,
@@ -35,12 +35,12 @@ async def RegisterUser(
         }
 
 
-# ================= POST Method for user Login =======================
+# ================= POST Method for user login =======================
 @router.post("/login")
 async def userlogin(
     data : UserLogin
 ):
-    res = UserService.Login(
+    res = AuthService.login(
         data.username,
         data.password
     )
@@ -60,3 +60,15 @@ async def userlogin(
             "role" : res["role"],
             "data" : data
         }
+    
+# ============== verify token =================
+@router.post('/login/verify')
+async def verify_token(
+    data : AuthToken
+):
+    res = AuthService.verify_session_token(
+        data.username,
+        data.token
+    )
+
+    return res

@@ -1,2 +1,5 @@
 [tool.fastapi]
-entrypoint = "backend.app.main:router"
+entrypoint = "main:router"
+
+[tool.pytest.ini._options]
+pythonpath = ["backend"]

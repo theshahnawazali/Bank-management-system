@@ -1,5 +1,6 @@
 import bcrypt
 
+
 def hash_password(password):
     return bcrypt.hashpw(
         password.encode(),
@@ -12,3 +13,9 @@ def verify_password(password, hashed_password):
         password.encode(),
         hashed_password.encode()
     )
+
+
+def generate_session_token(
+        token : str
+):
+    pass

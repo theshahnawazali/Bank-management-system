@@ -12,3 +12,7 @@ class UserRegister(BaseModel):
 class UserLogin(BaseModel):
     username : str
     password : str
+
+class AuthToken(BaseModel):
+    username : str
+    token : str
