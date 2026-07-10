@@ -1,6 +1,6 @@
 from fastapi import APIRouter
-from schemas.admin import ChangeStatus
-from services.admin_service import AdminService
+from backend.app.schemas.admin import ChangeStatus
+from backend.app.services.admin_service import AdminService
 
 router = APIRouter()
 

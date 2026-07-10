@@ -1,9 +1,9 @@
-from models.user import User
-from models.account import Account
-from models.requests import Request
+from backend.app.models.user import User
+from backend.app.models.account import Account
+from backend.app.models.requests import Request
 from sqlalchemy import select
-from services.bank_service import BankService
-from database.connection import SessionLocal
+from backend.app.services.bank_service import BankService
+from backend.app.database.connection import SessionLocal
 
 db = SessionLocal()
 

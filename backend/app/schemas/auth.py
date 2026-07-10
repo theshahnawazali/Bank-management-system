@@ -16,3 +16,7 @@ class UserLogin(BaseModel):
 class AuthToken(BaseModel):
     username : str
     token : str
+
+class OTP(BaseModel):
+    username : str
+    otp : int

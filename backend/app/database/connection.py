@@ -1,7 +1,7 @@
 import redis
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from core.config import (
+from backend.app.core.config import (
     REDIS_HOSTNAME,
     REDIS_PORT,
     REDIS_USERNAME,

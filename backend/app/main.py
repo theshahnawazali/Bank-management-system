@@ -1,18 +1,19 @@
 # All Import Code are Here
-from database.connection import SessionLocal, engine
-from database.base import Base
-from models.account import Account
-from models.requests import Request
-from models.transaction import Transaction
-from models.user import User
+from backend.app.database.connection import SessionLocal, engine
+from backend.app.database.base import Base
+from backend.app.models.account import Account
+from backend.app.models.requests import Request
+from backend.app.models.transaction import Transaction
+from backend.app.models.user import User
+from backend.app.models.audit import Audit
 from fastapi import FastAPI
-from api.auth import router as user_router
-from api.bank import router as bank_router
+from backend.app.api.auth import router as user_router
+from backend.app.api.bank import router as bank_router
 
 
-from services.bank_service import BankService
-from services.admin_service import AdminService
-from services.auth_service import AuthService
+from backend.app.services.bank_service import BankService
+from backend.app.services.admin_service import AdminService
+from backend.app.services.auth_service import AuthService
 
 Base.metadata.create_all(engine)
 
@@ -29,46 +30,28 @@ async def root():
     }
 
 
-from utils.id_generator import generate_otp
+from backend.app.utils.id_generator import generate_otp
 
-# print(generate_otp())
-
-# print(
-#     AuthService.create_and_send_otp("shahnawazali")
-# )
-
-# print(
-#     AuthService.verify_otp(
-#         "shahnawazali",
-#         352338
-#     )
-# )
-import time 
-start = time.time()
-
-# print(
-#     AuthService.register(
-#         "Shahnawaz Ali",
-#         "shahnawaz@gmail.com",
-#         "shahnawaz",
-#         "password"
-#     )
-# )
+# =============== Test Login =====================
 
 print(
-    # AuthService.verify_register_otp(
-    #     "shahnawaz",
-    #     "123456"
-    # )
-
-    AuthService.register(
-        "Shahnawaz Ali",
-        "shahnawazali@gmail.com",
+    AuthService.login(
         "shahnawaz",
         "password"
+    ),
+
+    AuthService.login(
+        "shahnawaz",
+        "incorrect",
+    ),
+    AuthService.login(
+        "gjhskjl",
+        "fghjl"
     )
 )
 
-end = time.time()
-
-print(end - start)
+print(
+    BankService.get_balance(
+        1
+    )
+)

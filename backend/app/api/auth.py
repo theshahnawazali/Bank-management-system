@@ -1,8 +1,8 @@
 from fastapi import APIRouter
-from schemas.auth import UserRegister, UserLogin, AuthToken
-from database.dependencies import get_db
+from backend.app.schemas.auth import UserRegister, UserLogin, AuthToken
+from backend.app.database.dependencies import get_db
 from pydantic import EmailStr
-from services.auth_service import AuthService
+from backend.app.services.auth_service import AuthService
 
 router = APIRouter()
 
@@ -72,3 +72,32 @@ async def verify_token(
     )
 
     return res
+
+@router.post('/register/verify/otp')
+async def veryfy_register_otp(
+    data : AuthToken
+):
+    res = AuthService.verify_register_otp(
+        data.username,
+        data.otp
+    )
+
+    if res is True:
+        return True
+    else:
+        return False
+    
+@router.post('/login/verify/otp')
+async def veryfy_register_otp(
+    data : AuthToken
+):
+    res = AuthService.verify_register_otp(
+        data.username,
+        data.otp
+    )
+
+    if res is True:
+        return True
+    else:
+        return False
+    

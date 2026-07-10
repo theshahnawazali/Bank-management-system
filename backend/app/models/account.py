@@ -2,8 +2,8 @@ from sqlalchemy import Float, DateTime, Integer, BigInteger, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.sql import func
-from database.base import Base
-from enums import AccountType, AccountStatus
+from backend.app.database.base import Base
+from backend.app.enums import AccountType, AccountStatus
 
 class Account(Base):
     __tablename__ = "accounts"

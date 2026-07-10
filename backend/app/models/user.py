@@ -1,5 +1,5 @@
-from database.base import Base
-from enums import UserRole
+from backend.app.database.base import Base
+from backend.app.enums import UserRole
 from sqlalchemy import Column, Integer, String, DateTime, Enum, Boolean
 from sqlalchemy.sql import func
 from sqlalchemy.orm import Mapped, mapped_column

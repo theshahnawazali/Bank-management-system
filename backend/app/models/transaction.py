@@ -2,8 +2,8 @@ from sqlalchemy.orm import mapped_column, Mapped
 from sqlalchemy import Integer, String, Float, Column, ForeignKey, DateTime
 from sqlalchemy.sql import func
 from sqlalchemy import Enum as SQLEnum
-from database.base import Base
-from enums import TransactionStatus, TransactionType
+from backend.app.database.base import Base
+from backend.app.enums import TransactionStatus, TransactionType
 
 
 class Transaction(Base):

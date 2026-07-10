@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from database.dependencies import get_db
-from schemas.account import UserAccountDetails, UserUpdateBalance
-from services.bank_service import BankService
+from backend.app.database.dependencies import get_db
+from backend.app.schemas.account import UserAccountDetails, UserUpdateBalance
+from backend.app.services.bank_service import BankService
 
 router = APIRouter()
 

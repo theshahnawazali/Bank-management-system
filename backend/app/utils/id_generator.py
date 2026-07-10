@@ -2,9 +2,9 @@ import random
 import secrets
 import uuid
 from datetime import datetime
-from database.connection import SessionLocal
-from models.account import Account
-from models.transaction import Transaction
+from backend.app.database.connection import SessionLocal
+from backend.app.models.account import Account
+from backend.app.models.transaction import Transaction
 import secrets
 
 db = SessionLocal()

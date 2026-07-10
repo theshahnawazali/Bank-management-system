@@ -1,9 +1,9 @@
 from sqlalchemy import String, Integer, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
-from database.base import Base
+from backend.app.database.base import Base
 from sqlalchemy import Enum as SQLEnum
-from enums import SessionStatus
+from backend.app.enums import SessionStatus
 
 
 class SessionLocal(Base):

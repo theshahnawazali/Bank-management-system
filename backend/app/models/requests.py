@@ -1,9 +1,9 @@
-from database.base import Base
+from backend.app.database.base import Base
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, ForeignKey, DateTime
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.sql import func
-from enums import AccountStatus, RequestStatus
+from backend.app.enums import AccountStatus, RequestStatus
 
 
 class Request(Base):
