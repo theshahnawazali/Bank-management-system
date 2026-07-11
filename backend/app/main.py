@@ -9,6 +9,7 @@ from backend.app.models.audit import Audit
 from fastapi import FastAPI
 from backend.app.api.auth import router as user_router
 from backend.app.api.bank import router as bank_router
+from backend.app.api.admin import router as admin_router
 
 
 from backend.app.services.bank_service import BankService
@@ -22,6 +23,7 @@ app = FastAPI()
 
 app.include_router(user_router)
 app.include_router(bank_router)
+app.include_router(admin_router)
 
 @app.get('/')
 async def root():
@@ -29,29 +31,3 @@ async def root():
         "message" : "Hello World"
     }
 
-
-from backend.app.utils.id_generator import generate_otp
-
-# =============== Test Login =====================
-
-print(
-    AuthService.login(
-        "shahnawaz",
-        "password"
-    ),
-
-    AuthService.login(
-        "shahnawaz",
-        "incorrect",
-    ),
-    AuthService.login(
-        "gjhskjl",
-        "fghjl"
-    )
-)
-
-print(
-    BankService.get_balance(
-        1
-    )
-)

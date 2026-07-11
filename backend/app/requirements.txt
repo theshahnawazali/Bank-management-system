@@ -1,3 +1,11 @@
 pymysql
 SQLAlchemy
 bcrypt
+fastapi
+uvicorn
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+redis
+dotenv
+pydantic[email]

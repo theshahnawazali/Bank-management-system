@@ -3,10 +3,11 @@ from backend.app.database.connection import SessionLocal
 from backend.app.models.user import User
 from backend.app.models.audit import Audit
 from backend.app.database.connection import redis_conn
-from backend.app.utils.security import hash_password, verify_password, generate_session_token
+from backend.app.core.security import hash_password, verify_password, create_session_token
 from backend.app.utils.id_generator import generate_token
 from sqlalchemy import select
 from backend.app.utils.id_generator import generate_otp
+from backend.app.core.security import create_session_token
 
 db = SessionLocal() # Will be removed when include fast api
 
