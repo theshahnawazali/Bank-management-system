@@ -8,6 +8,9 @@ class UserRegister(BaseModel):
     password : str
     role : str = "Customer"
 
+class UserLogout(BaseModel):
+    username : str
+    token : str
 
 class UserLogin(BaseModel):
     username : str
@@ -20,3 +23,12 @@ class AuthToken(BaseModel):
 class OTP(BaseModel):
     username : str
     otp : int
+
+class ForgetPassword(BaseModel):
+    username : str
+    new_password : str
+
+class ResetPassword(BaseModel):
+    username : str
+    password : str
+    new_password : str

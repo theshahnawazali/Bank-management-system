@@ -16,3 +16,7 @@ REDIS_HOSTNAME = os.environ.get("REDIS_HOSTNAME")
 REDIS_PORT = os.environ.get("REDIS_USERNAME")
 REDIS_USERNAME = os.environ.get("REDIS_USERNAME")
 REDIS_PASSWORD = os.environ.get("REDIS_PASSWORD")
+
+
+SECRET_KEY = "Bank"
+ALGORITHM = "HS256"

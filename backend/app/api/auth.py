@@ -1,17 +1,30 @@
-from fastapi import APIRouter
-from backend.app.schemas.auth import UserRegister, UserLogin, AuthToken
+from fastapi import APIRouter, Depends
+from backend.app.schemas.auth import (
+    UserLogin,
+    UserLogout,
+    UserRegister,
+    OTP,
+    AuthToken,
+    ForgetPassword,
+    ResetPassword
+)
+
 from backend.app.database.dependencies import get_db
 from pydantic import EmailStr
 from backend.app.services.auth_service import AuthService
 
 router = APIRouter()
 
-# ==================== POST Method for user register ====================
-@router.post('/register')
-async def RegisterUser(
-    data : UserRegister
+# =========================================================================
+#               AUTHENTICATION
+# =========================================================================
+@router.post('/auth/register',summary="Register User",tags=["Authentication"])
+async def register(
+    data : UserRegister,
+    db = Depends(get_db)
 ):
     res = AuthService.register(
+        db,
         data.name,
         data.email,
         data.username,
@@ -19,85 +32,87 @@ async def RegisterUser(
         data.role
     )
 
-    if res["status"]:
-        return {
-            "status" : res["status"],
-            "message" : res["message"],
-            "role" : data.role,
-            "data" : data
-        }
-    
-    else:
-        return {
-            "status" : res["status"],
-            "message" : res["message"],
-            "data" : data
-        }
+    return res
 
+@router.post('/auth/verify-email',summary="Verify Email", tags=["Authentication"])
+async def verify_email(
+    data : OTP
+):
+    res = AuthService.verify_email(
+        data.username,
+        data.otp
+    )
 
-# ================= POST Method for user login =======================
-@router.post("/login")
-async def userlogin(
+    return res
+
+@router.post('/auth/login',summary="Login",tags=["Authentication"])
+async def login(
     data : UserLogin
 ):
-    res = AuthService.login(
+    res =AuthService.login(
         data.username,
         data.password
     )
 
-    if res["status"] == False:
-        return {
-            "status" : res["status"],
-            "message" : res["message"],
-            "role" : res["role"],
-            "data" : data
-        }
-    
-    else:
-        return {
-            "status" : res["status"],
-            "message" : res["message"],
-            "role" : res["role"],
-            "data" : data
-        }
-    
-# ============== verify token =================
-@router.post('/login/verify')
-async def verify_token(
-    data : AuthToken
+    return res
+@router.post('/auth/verify-login-otp',summary="Verify Login otp",tags=['Authentication'])
+async def verify_login_otp(
+    data : OTP
 ):
-    res = AuthService.verify_session_token(
+    res = AuthService.verify_login_otp(
+        data.username,
+        data.otp
+    )
+
+    return res
+
+@router.post('/auth/logout',summary='Logout User',tags=["Authentication"])
+async def logout(
+    data : UserLogout
+):
+    res = AuthService.Logout(
         data.username,
         data.token
     )
 
     return res
 
-@router.post('/register/verify/otp')
-async def veryfy_register_otp(
-    data : AuthToken
+@router.post('/auth/forget-password',summary="Forget Password",tags=["Authentication"])
+async def forget_password(
+    data : ForgetPassword,
+    db = Depends(get_db)
 ):
-    res = AuthService.verify_register_otp(
+    res = AuthService.forget_password(
+        db,
+        data.username,
+        data.new_password
+    )
+    return res
+
+@router.post("/auth/verify-reset-otp",summary="Verify Reset password",tags=['Authentication'])
+async def verify_reset_otp(
+    data : OTP
+):
+    res = AuthService.verify_otp(
         data.username,
         data.otp
     )
+    return res
 
-    if res is True:
-        return True
-    else:
-        return False
-    
-@router.post('/login/verify/otp')
-async def veryfy_register_otp(
-    data : AuthToken
+@router.post("/auth/reset-password",summary="Reset Password",tags=['Authentication'])
+async def reset_password(
+    data : ResetPassword
 ):
-    res = AuthService.verify_register_otp(
+    res = AuthService.reset_password(
         data.username,
-        data.otp
+        data.password,
+        data.new_password
     )
 
-    if res is True:
-        return True
-    else:
-        return False
-    
+    return res
+
+@router.get('auth/{username}',summary="Will be implement in future",tags=['Authentication'])
+async def get_me(
+    username : str
+):
+    pass

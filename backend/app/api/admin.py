@@ -1,27 +1,23 @@
 from fastapi import APIRouter
 from backend.app.schemas.admin import ChangeStatus
 from backend.app.services.admin_service import AdminService
+from backend.app.services.auth_service import AuthService
 
 router = APIRouter()
 
-@router.post('/admin/{account_status}')
-async def change_bank_account_status(
-    account_status : str,
-    data : ChangeStatus
+@router.get('/admin/users',summary="Get all users",tags=['Admin'])
+async def get_all_user():
+    res = AuthService.get_all_users()
+
+    return res
+
+@router.get('/admin/user/{username}',summary="Get user by username",tags=['Admin'])
+async def get_user_by_username(
+    username : str
 ):
-    res = AdminService.change_bank_account_status(
-        data.account_number,
-        data.admin_username,
-        account_status
+    res = AuthService.get_user_by_username(
+        username
     )
 
-    return {
-        "status" : res["status"],
-        "message" : res["message"]
-    }
+    return res
 
-@router.post('/admin/delete')
-async def delete(
-    account_number : int
-):
-    pass

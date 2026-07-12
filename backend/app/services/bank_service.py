@@ -1,5 +1,6 @@
 from backend.app.models.user import User
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from backend.app.models.account import Account
 from backend.app.models.transaction import Transaction
 from backend.app.models.requests import Request
@@ -8,6 +9,16 @@ from datetime import datetime
 from backend.app.core.config import DAILY_LIMIT
 from backend.app.database.connection import redis_conn
 from backend.app.services.auth_service import AuthService
+from backend.app.exceptions import (
+    BankAccountAlreadyExist,
+    NegativeBalance,
+    BankAccountNotExists,
+    AccountNotActive,
+    WithdrawalLimit,
+    InsufficientBalance,
+    TemporaryLock
+)
+
 
 from backend.app.database.connection import SessionLocal
 db = SessionLocal()
@@ -22,10 +33,11 @@ class BankService:
     
     @classmethod
     def create_account(
-            username : str,
-            AccountType : str,
-            balance : float,
-            status : str
+        cls,
+        username : str,
+        AccountType : str,
+        balance : float,
+        status : str
     ):
         UserUsername = db.query(User).filter(User.username == username).first()
         UserId = UserUsername.user_id
@@ -42,10 +54,7 @@ class BankService:
                 "Account",
                 "Failed"
             )
-            return {
-                "status" : False,
-                "message" : "User have an exiting account"
-            }
+            raise BankAccountAlreadyExist("User have an existing account")
 
         UserAccount = Account(
             user_id = UserId,
@@ -55,22 +64,27 @@ class BankService:
             status = status
         )
 
-        db.add(UserAccount)
-        db.commit()
+        try:
+            db.add(UserAccount)
+            db.commit()
+            AuthService.save_audit_log(
+                username,
+                "Create Account",
+                "123.1.1.1",
+                f"{username} account created successfully",
+                AuthService.get_user_role_by_username(username),
+                "Account",
+                "Success"
+            )
+            return {
+                "status" : True,
+                "message" : "Account created successfully"
+            }
+        
+        except IntegrityError:
+            db.rollback()
 
-        AuthService.save_audit_log(
-            username,
-            "Create Account",
-            "123.1.1.1",
-            f"{username} account created successfully",
-            AuthService.get_user_role_by_username(username),
-            "Account",
-            "Success"
-        )
-        return {
-            "status" : True,
-            "message" : "Account created successfully"
-        }
+
 
     @classmethod
     def get_current_user(cls, account_number : int):
@@ -85,484 +99,38 @@ class BankService:
             return False
 
     @classmethod
-    def get_balance(cls, account_id : int):
-        
-        if cls.get_account_number_by_id(account_id):
-            cls.__account_number = cls.get_account_number_by_id(account_id)
-            user = db.query(Account).filter(Account.account_number == cls.__account_number).first()
-
-            username = cls.get_username_by_account_number(cls.__account_number)
-            AuthService.save_audit_log(
-                username,
-                "Check Balance",
-                "123.1.1.1",
-                f"{username} balance fecth successfull",
-                AuthService.get_user_role_by_username(username),
-                "Account",
-                "Success"
+    def get_balance(cls, account_number : int):
+        with db:
+            balance = db.scalar(
+                select(Account.balance).where(Account.account_number == account_number)
             )
         
-            return user.balance
-        else:
-            AuthService.save_audit_log(
-                None,
-                "Check Balance",
-                "123.1.1.1",
-                f"balance fecth unsuccessfull",
-                None,
-                "Account",
-                "Failed"
-            )
-            return False
-        
-        
-    
-    @classmethod
-    def UpdateBalance(
-        cls,
-        sendar_account_number : int,
-        amount : int,
-        transaction_type : str,
-        receiver_account_number : int = None,
-    ):
-        cls.__sender_account_number = sendar_account_number
-        cls.__receiver_account_number = receiver_account_number
-        cls.__amount = amount
-        sender = cls.get_current_user(cls.__sender_account_number)
-        receiver = cls.get_current_user(cls.__receiver_account_number)
-        transaction_id = generate_reference_number()
-
-        # Check user login
-
-        # Check Amount > 0
-        if cls.__amount <= 0:
-            AuthService.save_audit_log(
-                cls.get_username_by_account_number(cls.__sender_account_number),
-                "Update Balance",
-                "123.1.1.1",
-                "Amount can not be negative or Zero",
-                None,
-                "Account",
-                "Failed"
-            )
-            return {
-                "status" : False,
-                "Balance" : sender.balance,
-                "transaction id" : None,
-                "message" : "Amount can not be negative or Zero"
-            }
-
-        # Check whether sendar account exit or not
-        if cls.check_account_number_exits(cls.__sender_account_number):
-            lock = redis_conn.lock(cls.__sender_account_number, timeout=30)
-
-        else:
-            AuthService.save_audit_log(
-                cls.get_username_by_account_number(cls.__sender_account_number),
-                "Update Balance",
-                "123.1.1.1",
-                "Account does not exists.",
-                None,
-                "Account",
-                "Failed"
-            )
-            return {
-                "status" : False,
-                "Balance" : None,
-                "transaction id" : None,
-                "message" : "Account does not exists."
-            }
-        
-        # Check whether account is active or not
-        if not cls.check_account_status(cls.__sender_account_number) == "Active":
-            AuthService.save_audit_log(
-                cls.get_username_by_account_number(cls.__sender_account_number),
-                "Update Balance",
-                "123.1.1.1",
-                "Account is not active",
-                None,
-                "Account",
-                "Failed"
-            )
-            return {
-                "status" : False,
-                "Balance" : None,
-                "transaction id" : None,
-                "message" : "Account is not active"
-            }
-        
-        if lock.acquire():
-            try:                
-                #  Update deposit balance
-                if transaction_type == "deposit":
-                            
-                    # Update Balance
-                    sender.balance += cls.__amount
-                    db.commit()
-
-                    # Update Transaction history
-                    cls.update_transaction(
-                        cls.__sender_account_number,
-                        cls.__amount,
-                        "Deposit",
-                        transaction_id,
-                        "Success"
-                    )
-
-                    AuthService.save_audit_log(
-                        cls.get_username_by_account_number(cls.__sender_account_number),
-                        "Deposit",
-                        "123.1.1.1",
-                        "Deposit Succesfull",
-                        None,
-                        "Account",
-                        "Success"
-                    )
-                    return {
-                        "status" : True,
-                        "Balance" : sender.balance,
-                        "transaction id" : transaction_id,
-                        "message" : "Deposit Succesfull"
-                    }            
-
-                
-                #  Update withdraw balance
-                elif transaction_type == "withdraw":
-                    # Check user have sufficient balance or not
-                    if sender.balance - cls.__amount < 0:
-                        cls.update_transaction(
-                            cls.__sender_account_number,
-                            cls.__amount,
-                            "Withdraw",
-                            transaction_id,
-                            "Failed"
-                        )
-
-                        AuthService.save_audit_log(
-                            cls.get_username_by_account_number(cls.__sender_account_number),
-                            "Deposit",
-                            "123.1.1.1",
-                            f"{cls.get_username_by_account_number(cls.__sender_account_number)} have insufficient Amount",
-                            None,
-                            "Account",
-                            "Failed"
-                        )
-
-                        return {
-                            "status" : False,
-                            "Balance" : sender.balance,
-                            "transaction id" : None,
-                            "message" : "Insufficient Amount",
-                        }
-                    else:
-                        # Check user widrawal limit for today
-                        if cls.get_user_withdrawal_limit(cls.__sender_account_number):
-
-                            # Check Reciever account exist
-                            if cls.check_account_number_exits(cls.__sender_account_number):
-
-                                # Check account status
-                                if cls.check_account_status(cls.__sender_account_number) == "Active":
-
-                                    # Update Balance
-                                    sender.balance -= cls.__amount
-                                    db.commit()
-
-                                    # Update Transaction
-                                    cls.update_transaction(
-                                        cls.__sender_account_number,
-                                        cls.__amount,
-                                        "Withdraw",
-                                        transaction_id,
-                                        "Success"
-                                    )
-
-                                    AuthService.save_audit_log(
-                                        cls.get_username_by_account_number(cls.__sender_account_number),
-                                        "Deposit",
-                                        "123.1.1.1",
-                                        f"{cls.get_username_by_account_number(cls.__sender_account_number)} withdrawal successfull",
-                                        None,
-                                        "Account",
-                                        "Success"
-                                    )
-
-                                    return {
-                                        "status" : True,
-                                        "Balance" : sender.balance,
-                                        "transaction id" : transaction_id,
-                                        "message" : "Withdrawal Succesfull"
-                                    }
-                                else:
-                                    AuthService.save_audit_log(
-                                        cls.get_username_by_account_number(cls.__sender_account_number),
-                                        "Deposit",
-                                        "123.1.1.1",
-                                        f"{cls.get_username_by_account_number(cls.__sender_account_number)} account is not active",
-                                        None,
-                                        "Account",
-                                        "Failed"
-                                    )
-                                    return {
-                                        "status" : False,
-                                        "Balance" : None,
-                                        "transaction id" : None,
-                                        "message" : "Account is not active",
-                                    }
-                            else:
-                                return {
-                                    "status" : False,
-                                    "Balance" : None,
-                                    "transaction id" : None,
-                                    "message" : "Sender account does not exit",
-                                }
-
-                        else:
-                            AuthService.save_audit_log(
-                                cls.get_username_by_account_number(cls.__sender_account_number),
-                                "Deposit",
-                                "123.1.1.1",
-                                f"{cls.get_username_by_account_number(cls.__sender_account_number)} withdraw limit reached",
-                                None,
-                                "Account",
-                                "Failed"
-                            )
-                            return {
-                                "status" : False,
-                                "Balance" : None,
-                                "transaction id" : None,
-                                "message" : "Withdraw limit reached",
-                            }
-
-                #  Update transfer balance
-                elif transaction_type == "transfer":
-
-                    
-                    # Check reciever account exit or not
-                    if cls.check_account_number_exits(cls.__receiver_account_number):
-
-                        # Check whether sender and receiver are not same
-                        if cls.__sender_account_number == cls.__receiver_account_number:
-                            AuthService.save_audit_log(
-                                cls.get_username_by_account_number(cls.__sender_account_number),
-                                "Transfer",
-                                "123.1.1.1",
-                                f"{cls.get_username_by_account_number(cls.__sender_account_number)} can not Tranfer to same account",
-                                None,
-                                "Account",
-                                "Failed"
-                            )
-                            return {
-                                "status" : False,
-                                "Balance" : sender.balance,
-                                "transaction id" : None,
-                                "message" : "Can not Tranfer to same account"
-                            }
-
-                        # Check where sender have enough balance
-                        if sender.balance < 0 or sender.balance - cls.__amount < 0:
-                            cls.update_transaction(
-                                cls.__sender_account_number,
-                                cls.__amount,
-                                "Transfer",
-                                transaction_id,
-                                "Failed"
-                            )
-                            AuthService.save_audit_log(
-                                cls.get_username_by_account_number(cls.__sender_account_number),
-                                "Transfer",
-                                "123.1.1.1",
-                                f"{cls.get_username_by_account_number(cls.__sender_account_number)} have in sufficient amount",
-                                None,
-                                "Account",
-                                "Failed"
-                            )
-                            return {
-                                "status" : False,
-                                "Balance" : sender.balance,
-                                "transaction id" : None,
-                                "message" : "Insufficient Amount",
-                            }
-                        else:
-                            sender.balance -= cls.__amount
-                            receiver.balance += cls.__amount
-
-                            cls.update_transaction(
-                                cls.__sender_account_number,
-                                cls.__amount,
-                                "Transfer",
-                                transaction_id,
-                                "Success"
-                            )
-
-                            db.commit()
-
-                            cls.update_transaction(
-                                cls.__receiver_account_number,
-                                cls.__amount,
-                                "Recieve",
-                                transaction_id,
-                                "Success"
-                            )
-                            
-                            AuthService.save_audit_log(
-                                cls.get_username_by_account_number(cls.__sender_account_number),
-                                "Transfer",
-                                "123.1.1.1",
-                                f"{cls.get_username_by_account_number(cls.__sender_account_number)} trasfered amount to {cls.get_username_by_account_number(cls.__receiver_account_number)}",
-                                None,
-                                "Account",
-                                "Success"
-                            )
-
-                            return {
-                                "status" : True,
-                                "Balance" : sender.balance,
-                                "transaction id" : transaction_id,
-                                "message" : "Transfer Successful",
-                            }
-                    else:
-                        AuthService.save_audit_log(
-                                cls.get_username_by_account_number(cls.__sender_account_number),
-                                "Transfer",
-                                "123.1.1.1",
-                                "Reciever account does not exits",
-                                None,
-                                "Account",
-                                "Failed"
-                            )
-                        return {
-                            "status" : False,
-                            "Balance" : None,
-                            "transaction id" : None,
-                            "message" : "Receiver Account does not exists."
-                        }
-                    
-                
-                else:
-                    AuthService.save_audit_log(
-                        cls.get_username_by_account_number(cls.__sender_account_number),
-                        "Update Balance",
-                        "123.1.1.1",
-                        "Invalid method",
-                        None,
-                        "Account",
-                        "Failed"
-                    )
-                    return {
-                        "status" : False,
-                        "Balance" : None,
-                        "transaction id" : None,
-                        "message" : "Invalid method"
-                    }
-                
-            finally:
-                lock.release()
-
-        else:
-            AuthService.save_audit_log(
-                cls.get_username_by_account_number(cls.__sender_account_number),
-                "Update Balance",
-                "123.1.1.1",
-                "Account is temporiry lock",
-                None,
-                "Account",
-                "Failed"
-            )
-            return {
-                "status" : False,
-                "Balance" : None,
-                "transaction id" : None,
-                "message" : "Account is temporiry lock"
-            }
-
-    @classmethod
-    def update_transaction(
-            cls,
-            account_number : int,
-            amount : float,
-            transaction_type : str,
-            transaction_id : str,
-            status : str
-        ):
-        cls.__account_number = account_number
-        cls.__amount = amount
-
-        try:
-            CurrentUser = db.query(Account).filter(Account.account_number == cls.__account_number).first()
-
-
-            Current_transaction = Transaction(
-                account_id = CurrentUser.account_id,
-                amount = cls.__amount,
-                transaction_id = transaction_id,
-                transaction_type = transaction_type,
-                status = status
-            )
-
-            db.add(Current_transaction)
-            db.commit()
-
-            return True
-        
-        except:
-            return False
-        
-
-    @classmethod
-    def get_transaction_history(
-        cls,
-        account_number : int
-    ):
-        cls.__account_number = account_number
-        # Check account exists
-        if cls.check_account_number_exits(cls.__account_number):
-            # Check account status is active or not 
-            if cls.check_account_status(cls.__account_number) == 'Active':
-                
-                stmt = (
-                    select(
-                        Account.account_id,
-                        Account.account_number,
-                        Transaction.transaction_id,
-                        Transaction.transaction_type,
-                        Transaction.amount,
-                        Transaction.date,
-                        Transaction.status,
-                    )
-                    .join(Account, Account.account_id == Transaction.account_id)
-                    .where(Account.account_number == cls.__account_number)
+            if balance:
+                username = cls.get_username_by_account_number(account_number)
+                AuthService.save_audit_log(
+                    username,
+                    "Check Balance",
+                    "123.1.1.1",
+                    f"{username} balance fecth successfull",
+                    AuthService.get_user_role_by_username(username),
+                    "Account",
+                    "Success"
                 )
-
-                rows = db.execute(stmt).all()
-
-                return [
-                    {
-                        "account_id": row.account_id,
-                        "account_number": row.account_number,
-                        "transaction_id": row.transaction_id,
-                        "transaction_type": row.transaction_type,
-                        "amount": row.amount,
-                        "date": row.date,
-                        "status": row.status,
-                    }
-                    for row in rows
-                ]
-            
+                return balance
             else:
-                return {
-                    "status" : False,
-                    "message" : "Account is not active",
-                    "trasactions" : None
-                }
-
-        else:
-            return {
-                "status" : False,
-                "message" : "Account does not exist",
-                "trasactions" : None
-            }
+                AuthService.save_audit_log(
+                    None,
+                    "Check Balance",
+                    "123.1.1.1",
+                    f"balance fecth unsuccessfull",
+                    None,
+                    "Account",
+                    "Failed"
+                )
+                return False
         
+        
+
     @classmethod
     def get_account_details(
         cls,
@@ -852,3 +420,368 @@ class BankService:
                 return user
             else:
                 return None
+            
+    
+    def get_all_accounts():
+        with db:
+            accounts = db.scalars(
+                select(Account).join(User, User.user_id == Account.user_id)
+            )
+
+            if accounts:
+                return [
+                    {
+                        # "username" : account.username,
+                        "account number" : account.account_number,
+                        "balance" : account.balance,
+                        "account type" : account.account_type,
+                        "status" : account.status,
+                        "created at" : account.created_at
+                        
+                    }
+                    for account in accounts
+                ]
+            
+    @classmethod
+    def freeze_account(
+        cls,
+        account_number : int
+    ):
+        with db:
+            user = db.scalar(
+                select(Account).where(Account.account_number == account_number)
+            )
+
+            if user:
+                user.status == "Frozen"
+                db.commit()
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Acoount Status",
+                    "123.1.1.1",
+                    "User account has been frozen",
+                    "Admin",
+                    "Account",
+                    "Success"
+                )
+
+                return True
+            else:
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Acoount Status",
+                    "123.1.1.1",
+                    "User account has been frozen",
+                    "Admin",
+                    "Account",
+                    "Failed"
+                )
+                raise BankAccountNotExists("Account number not exists")
+            
+    @classmethod
+    def unfreeze_account(
+        cls,
+        account_number : int
+    ):
+        with db:
+            user = db.scalar(
+                select(Account).where(Account.account_number == account_number)
+            )
+
+            if user:
+                user.status == "Active"
+                db.commit()
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Acoount Status",
+                    "123.1.1.1",
+                    "User account has been Active",
+                    "Admin",
+                    "Account",
+                    "Success"
+                )
+
+                return True
+            else:
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Acoount Status",
+                    "123.1.1.1",
+                    "User account has been Active",
+                    "Admin",
+                    "Account",
+                    "Failed"
+                )
+                raise BankAccountNotExists("Account number not exists")
+
+
+    @classmethod
+    def deposit(
+        cls,
+        account_number : int,
+        amount : float
+    ):
+        with db:
+            user = db.scalar(
+                select(Account).where(Account.account_number == account_number)
+            )
+
+            if user:
+                user.balance += amount
+                db.commit()
+
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Deposit",
+                    "123.1.1.1",
+                    f"{amount} deposited to account",
+                    "Customer",
+                    "Account",
+                    "Success"
+                )
+
+                return user.balance
+            else:
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Deposit",
+                    "123.1.1.1",
+                    f"{amount} deposited to account",
+                    "Customer",
+                    "Account",
+                    "Failed"
+                )
+                raise BankAccountNotExists("Account number does not exists")
+            
+    @classmethod
+    def deposit(
+        cls,
+        account_number : int,
+        amount : float
+    ):
+        with db:
+            user = db.scalar(
+                select(Account).where(Account.account_number == account_number)
+            )
+
+            if user:
+                user.balance += amount
+                db.commit()
+
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Deposit",
+                    "123.1.1.1",
+                    f"{amount} deposited to account",
+                    "Customer",
+                    "Account",
+                    "Success"
+                )
+
+                return user.balance
+            else:
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Deposit",
+                    "123.1.1.1",
+                    f"{amount} deposited to account",
+                    "Customer",
+                    "Account",
+                    "Failed"
+                )
+                raise BankAccountNotExists("Account number does not exists")
+            
+    @classmethod
+    def withdraw(
+        cls,
+        account_number : int,
+        amount : float
+    ):
+        with db:
+            user = db.scalar(
+                select(Account).where(Account.account_number == account_number)
+            )
+
+            if user:
+                user.balance -= amount
+                db.commit()
+
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Withdraw",
+                    "123.1.1.1",
+                    f"{amount} withdraw from account",
+                    "Customer",
+                    "Account",
+                    "Success"
+                )
+
+                return user.balance
+            else:
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(account_number),
+                    "Withdraw",
+                    "123.1.1.1",
+                    f"{amount} withdraw from account",
+                    "Customer",
+                    "Account",
+                    "Failed"
+                )
+                raise BankAccountNotExists("Account number does not exists")
+            
+    @classmethod
+    def transfer(
+        cls,
+        sender_account_number : int,
+        receiver_account_number : int,
+        amount : float
+    ):
+        with db:
+            sender = db.scalar(
+                select(Account).where(Account.account_number == sender_account_number)
+            )
+
+            receiver = db.scalar(
+                select(Account).where(Account.account_number == receiver_account_number)
+            )
+
+            if sender:
+                if receiver:
+                    sender.balance -= amount
+                    receiver.balance += amount
+
+                    AuthService.save_audit_log(
+                        cls.get_username_by_account_number(sender_account_number),
+                        "Transfer",
+                        "123.1.1.1",
+                        f"{amount} transfer from to {receiver_account_number}",
+                        "Customer",
+                        "Account",
+                        "Success"
+                    )
+                    return sender.balance
+                else:
+                    AuthService.save_audit_log(
+                        cls.get_username_by_account_number(sender_account_number),
+                        "Transfer",
+                        "123.1.1.1",
+                        f"{amount} transfer from to {receiver_account_number}",
+                        "Customer",
+                        "Account",
+                        "Failed"
+                    )
+                    raise BankAccountNotExists("Receiver account does not exist")
+                
+            else:
+                AuthService.save_audit_log(
+                    cls.get_username_by_account_number(sender_account_number),
+                    "Transfer",
+                    "123.1.1.1",
+                    f"{amount} transfer from to {receiver_account_number}",
+                    "Customer",
+                    "Account",
+                    "Failed"
+                )
+                raise BankAccountNotExists("Sender account does not exist")
+                                      
+    @classmethod
+    def get_transaction_history(
+        cls,
+        account_number : int
+    ):
+        cls.__account_number = account_number
+        # Check account exists
+        if cls.check_account_number_exits(cls.__account_number):
+            # Check account status is active or not 
+            if cls.check_account_status(cls.__account_number) == 'Active':
+                
+                stmt = (
+                    select(
+                        Account.account_id,
+                        Account.account_number,
+                        Transaction.transaction_id,
+                        Transaction.transaction_type,
+                        Transaction.amount,
+                        Transaction.date,
+                        Transaction.status,
+                    )
+                    .join(Account, Account.account_id == Transaction.account_id)
+                    .where(Account.account_number == cls.__account_number)
+                )
+
+                rows = db.execute(stmt).all()
+
+                return [
+                    {
+                        "account_id": row.account_id,
+                        "account_number": row.account_number,
+                        "transaction_id": row.transaction_id,
+                        "transaction_type": row.transaction_type,
+                        "amount": row.amount,
+                        "date": row.date,
+                        "status": row.status,
+                    }
+                    for row in rows
+                ]
+            
+            else:
+                raise AccountNotActive("Account is not active")
+        else:
+            raise BankAccountNotExists("Account does not exits")
+        
+    def get_all_transaction_history(
+    ):
+        stmt = (
+            select(
+                Account.account_id,
+                Account.account_number,
+                Transaction.transaction_id,
+                Transaction.transaction_type,
+                Transaction.amount,
+                Transaction.date,
+                Transaction.status,
+            )
+            .join(Account, Account.account_id == Transaction.account_id)
+        )
+
+        rows = db.execute(stmt).all()
+
+        return [
+            {
+                "account_id": row.account_id,
+                "account_number": row.account_number,
+                "transaction_id": row.transaction_id,
+                "transaction_type": row.transaction_type,
+                "amount": row.amount,
+                "date": row.date,
+                "status": row.status,
+            }
+            for row in rows
+        ]
+        
+    @classmethod
+    def get_transaction_id_history(
+        cls,
+        trasaction_id : str
+    ):
+        with db:
+            historys = db.execute(
+                select(
+                    Transaction
+                )
+                .join(Account, Account.account_id == Transaction.transaction_id)
+                .where(Transaction.transaction_id == trasaction_id)
+            )
+
+            if historys:
+                return [
+                    {
+                        "account number" : history.account_number,
+                        "trasaction_id" : history.transaction_id,
+                        "trasaction_type" : history.transaction_type,
+                        "date" : history.date,
+                        "status" : history.status,
+                    }
+                    for history in historys
+                ]
+  

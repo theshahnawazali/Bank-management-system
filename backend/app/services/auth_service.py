@@ -7,20 +7,29 @@ from backend.app.core.security import hash_password, verify_password, create_ses
 from backend.app.utils.id_generator import generate_token
 from sqlalchemy import select
 from backend.app.utils.id_generator import generate_otp
-from backend.app.core.security import create_session_token
+from sqlalchemy.exc import IntegrityError
+from backend.app.core.security import create_session_token, hash_password, verify_password
+from backend.app.exceptions import (
+    UsernameAlreadyExists,
+    EmailAlreadyExists,
+    TokenSetUnsuccesfull,
+    RedisConnectionError,
+    UsernameNotExists,
+    IncorrectPassword
+)
 
-db = SessionLocal() # Will be removed when include fast api
+session = SessionLocal() # Will be removed when include fast api
 
 class AuthService:
     @classmethod
     def register(
         cls,
+        db,
         name : str,
         email : str,
         username : str,
         password : str,
-        role : str = "Customer"
-        # db 
+        role : str = "Customer",
     ):
         cls.__user_email = email
         cls.__user_username = username
@@ -53,7 +62,7 @@ class AuthService:
                         pipe.execute()
 
                         # save user to database
-                        with db:
+                        with session:
                             user = User(
                                 name = name,
                                 username = username,
@@ -63,25 +72,38 @@ class AuthService:
                                 role = role
                             )
 
-                            db.add(user)
-                            db.commit()
+                            try:
+                                db.add(user)
+                                db.commit()
 
-                            cls.save_audit_log(
-                                cls.__user_username,
-                                "Register",
-                                "123.1.1.1",
-                                f"{cls.__user_username} register succesfull",
-                                role,
-                                "User",
-                                "Success"
-                            )
+                                cls.save_audit_log(
+                                    cls.__user_username,
+                                    "Register",
+                                    "123.1.1.1",
+                                    f"{cls.__user_username} register succesfull",
+                                    role,
+                                    "User",
+                                    "Success"
+                                )
 
-                            return {
-                                "status" : True,
-                                "message" : "OTP sent successfully.",
-                                "role" : role
-                            }
-                            
+                                return {
+                                    "status" : True,
+                                    "message" : "OTP sent successfully.",
+                                    "role" : role
+                                }
+                            except:
+                                db.rollback()
+                                cls.save_audit_log(
+                                    cls.__user_username,
+                                    "Register",
+                                    "123.1.1.1",
+                                    f"{cls.__user_username} alrady exists",
+                                    role,
+                                    "User",
+                                    "Success"
+                                )
+                                raise UsernameAlreadyExists("Username already exits")
+        
                     else:
                         cls.save_audit_log(
                             cls.__user_username,
@@ -92,26 +114,18 @@ class AuthService:
                             "User",
                             "Failed"
                         )
-                        return {
-                            "status" : False,
-                            "message" : "Redis is not connected",
-                            "role" : None
-                        }
+                        raise RedisConnectionError("Redis is not connected")
                 else:
                     cls.save_audit_log(
                         cls.__user_username,
                         "Register",
                         "123.1.1.1",
-                        "Token set unsuccessfull",
+                        "Unable to set session token",
                         None,
                         "User",
                         "Failed"
                     )
-                    return {
-                        "status" : False,
-                        "message" : "Token set unsuccessfull",
-                        "role" : None
-                    }
+                    raise TokenSetUnsuccesfull("Unable to set session token")
             else:
                 cls.save_audit_log(
                     cls.__user_username,
@@ -122,11 +136,8 @@ class AuthService:
                     "User",
                     "Failed"
                 )
-                return {
-                    "status" : username,
-                    "message" : "Username already exits.",
-                    "role" : None
-                }
+                
+                raise UsernameAlreadyExists("Username already exists")
         else:
             cls.save_audit_log(
                 cls.__user_username,
@@ -137,11 +148,8 @@ class AuthService:
                 "User",
                 "Failed"
             )
-            return {
-                "status" : False,
-                "message" : "Email already exits.",
-                "role" : None
-            }
+
+            raise EmailAlreadyExists("Email already exist.")
                     
                 
     @classmethod
@@ -181,11 +189,7 @@ class AuthService:
                     "User",
                     "Failed"
                 )
-                return {
-                    "status" : False,
-                    "message" : "Incorrect Password",
-                    "role" : None
-                }
+                raise IncorrectPassword("Password is incorrect")
             
         else:
             cls.save_audit_log(
@@ -197,11 +201,7 @@ class AuthService:
                 "User",
                 "Failed"
             )
-            return {
-                "status" : False,
-                "message" : "Username does not exits",
-                "role" : None
-            }
+            raise UsernameNotExists("Username not exits")
 
     def Logout(
         username : str
@@ -226,12 +226,16 @@ class AuthService:
         role : str
     ):
         cls.__username = username
-        token = generate_token()
 
         key = cls.__username + ":" + role
+        
+        token = create_session_token({
+            "username" : cls.__username,
+            "role" : role
+        })
 
         try:
-            redis_conn.set(key, token, 6000)
+            redis_conn.set(key, token, 3600)
 
             return True
         except:
@@ -275,7 +279,7 @@ class AuthService:
             .where(User.username == username)
         )
 
-        role = db.execute(stmt).first()
+        role = session.execute(stmt).first()
 
         if role:
             return role.role
@@ -288,8 +292,8 @@ class AuthService:
         cls,
         username : str
     ):
-        with db:
-            email = db.scalar(
+        with session:
+            email = session.scalar(
                 select(User.email).where(User.username == username)
             )
 
@@ -321,7 +325,7 @@ class AuthService:
             }
         
     @classmethod
-    def verify_register_otp(
+    def verify_email(
         cls,
         username : str,
         user_otp : int
@@ -331,8 +335,8 @@ class AuthService:
 
         if otp == user_otp:
 
-            with db:
-                user = db.scalar(
+            with session:
+                user = session.scalar(
                     select(
                         User
                     ).where(User.username == username)
@@ -340,7 +344,7 @@ class AuthService:
                 if user:
                     user.is_varified = True
 
-                    db.commit()
+                    session.commit()
                     redis_conn.delete(key)
 
                     return True
@@ -351,7 +355,7 @@ class AuthService:
             return False
         
     @classmethod
-    def verify_login_otp(
+    def verify_otp(
         cls,
         username : str,
         user_otp : int
@@ -365,13 +369,15 @@ class AuthService:
         else:
             return False
     
+
+        
     @classmethod
     def check_unique_username(
         cls,
         username : str
     ):
-        with db:
-            user = db.scalar(
+        with session:
+            user = session.scalar(
                 select(User).where(User.username == username)
             )
 
@@ -385,8 +391,8 @@ class AuthService:
         cls,
         email : str
     ):
-        with db:
-            user = db.scalar(
+        with session:
+            user = session.scalar(
                 select(User).where(User.email == email)
             )
 
@@ -400,8 +406,8 @@ class AuthService:
         cls,
         username : str
     ):
-        with db:
-            user = db.scalar(
+        with session:
+            user = session.scalar(
                 select(User).where(User.username == username)
             )
 
@@ -415,8 +421,8 @@ class AuthService:
         cls,
         username : str
     ):
-        with db:
-            password = db.scalar(
+        with session:
+            password = session.scalar(
                 select(User.password).where(User.username == username)
             )
 
@@ -439,7 +445,7 @@ class AuthService:
 
         print(user_id)
 
-        with db:
+        with session:
             log = Audit(
                 user_id=user_id,
                 username=username,
@@ -451,18 +457,113 @@ class AuthService:
                 status=status
             )
 
-            db.add(log)
-            db.commit()
+            session.add(log)
+            session.commit()
 
     @classmethod
     def get_user_id_by_username(
         cls,
         username : str
     ):
-        with db:
-            userid = db.scalar(
+        with session:
+            userid = session.scalar(
                 select(User.user_id).where(User.username == username)
             )
 
             if userid:
                 return userid
+            
+    @classmethod
+    def create_otp(
+        cls,
+        username : str,
+    ):
+        try:
+            key = f"{username}:otp"
+            otp = generate_otp()
+
+            redis_conn.set(key, otp, 600)
+
+            return True
+        except redis.ConnectionError as e:
+            print(e)
+            return False
+    
+    @classmethod
+    def forget_password(
+        cls,
+        username : str,
+        new_password : str
+    ):
+        with session:
+            password = session.scalar(
+                select(User.password).where(User.username == username)
+            )
+
+            if password:
+                password = new_password
+
+                session.commit()
+
+                return True
+            else:
+                return False
+            
+    @classmethod
+    def reset_password(
+        cls,
+        username : str,
+        password : str,
+        new_password : str
+    ):
+        with session:
+            existing_password = session.scalar(
+                select(User).where(User.username == username)
+            )
+
+            if existing_password:
+                if verify_password(password, existing_password.password):
+                    existing_password.password = hash_password(new_password)
+                    session.commit()
+                    return True
+                else:
+                    raise IncorrectPassword("Incorrect password")
+            else:
+                return False
+            
+    def get_all_users():
+        with session:
+            users = session.scalars(
+                select(User)
+            )
+
+            if users:
+                return [
+                    {
+                        "name" : user.name,
+                        "username" : user.username,
+                        "email" : user.email,
+                        "role" : user.role,
+                        "is_varified" : user.is_varified
+                    }
+                    for user in users
+                ]
+            
+    @classmethod
+    def get_user_by_username(
+        cls,
+        username : str
+    ):
+        with session:
+            user = session.scalar(
+                select(User).where(User.username == username)
+            )
+
+            if user:
+                return {
+                    "name" : user.name,
+                    "username" : user.username,
+                    "email" : user.email,
+                    "role" : user.role,
+                    "is_varified" : user.is_varified
+                }
