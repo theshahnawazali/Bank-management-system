@@ -36,5 +36,3 @@ def generate_reference_number():
 def generate_token():
     return secrets.token_hex(10)
 
-def generate_otp():
-    return random.randint(100000, 999999)

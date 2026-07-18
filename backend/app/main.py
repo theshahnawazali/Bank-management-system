@@ -6,13 +6,16 @@ from backend.app.models.requests import Request
 from backend.app.models.transaction import Transaction
 from backend.app.models.user import User
 from backend.app.models.audit import Audit
-from fastapi import FastAPI
+from fastapi import FastAPI , HTTPException
 from fastapi import Request as API_Request
 from fastapi.responses import JSONResponse
+from backend.app.core.security import verify_session_token
 from backend.app.api.auth import router as user_router
-from backend.app.api.account import router as bank_router
+from backend.app.api.account import router as account_router
 from backend.app.api.admin import router as admin_router
-
+from backend.app.api.banking import router as bank_router
+from backend.app.middlerware.middleware import Middlerware
+# from backend.app.middlerware.middleware_logging import RequestLoggingMiddleware
 from backend.app.exceptions import (
     UsernameAlreadyExists,
     UsernameNotExists,
@@ -42,7 +45,23 @@ app = FastAPI()
 app.include_router(user_router)
 app.include_router(bank_router)
 app.include_router(admin_router)
+app.include_router(account_router)
 
+app.add_middleware(Middlerware)
+# app.add_middleware(RequestLoggingMiddleware)
+# ================== Middlewares =========================
+
+# print(
+#     # verify_session_token(
+#     #     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3R1c2VyMyIsInJvbGUiOiJBZG1pbiIsImV4cCI6MTc4NDE0Mjg5OH0.hp2h4NPkCk63HkT_FBgZikMX7a9j-JXR5oC9bjeBrTM"
+#     # ),
+#     BankService.deposit(
+#         879315081979,
+#         7946.26
+#     )
+# )
+
+# ============== Custom Exceptions ========================
 @app.exception_handler(UsernameNotExists)
 async def usernamenotexist(
     request : API_Request,
@@ -193,6 +212,18 @@ async def sameaccount(
 async def sameaccount(
     request : API_Request,
     exc : TemporaryLock
+):
+    return JSONResponse(
+        status_code=409,
+        content={
+            "details" :str(exc)
+        }
+    )
+
+@app.exception_handler(ValueError)
+async def value_error(
+    request : API_Request,
+    exc : ValueError
 ):
     return JSONResponse(
         status_code=409,

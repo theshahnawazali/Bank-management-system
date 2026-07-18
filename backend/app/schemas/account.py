@@ -9,7 +9,10 @@ class UserAccountDetails(BaseModel):
 class UserUpdateBalance(BaseModel):
     sender_account_number : int
     amount : float
-    transaction_type : str
+
+class Transfer(BaseModel):
+    sender_account_number : int
+    amount : float
     receiver_account_number : int = None
 
 class AccountStatus(BaseModel):

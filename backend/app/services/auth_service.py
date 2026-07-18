@@ -6,7 +6,6 @@ from backend.app.database.connection import redis_conn
 from backend.app.core.security import hash_password, verify_password, create_session_token
 from backend.app.utils.id_generator import generate_token
 from sqlalchemy import select
-from backend.app.utils.id_generator import generate_otp
 from sqlalchemy.exc import IntegrityError
 from backend.app.core.security import create_session_token, hash_password, verify_password
 from backend.app.exceptions import (
@@ -24,7 +23,6 @@ class AuthService:
     @classmethod
     def register(
         cls,
-        db,
         name : str,
         email : str,
         username : str,
@@ -38,11 +36,11 @@ class AuthService:
         if cls.check_unique_email(cls.__user_email):
             # check unique username
             if cls.check_unique_username(cls.__user_username):
-                if cls.set_session_token(username, role):
                     # check redis connection
                     redis_conn_status = True
                     if redis_conn_status:
                         pipe = redis_conn.pipeline(transaction=True)
+                        # Temp Data
                         pipe.hset(
                             f"user:{username}",
                             mapping={
@@ -54,12 +52,12 @@ class AuthService:
                             }
                         )
                         pipe.expire(f"user:{username}", 600)
-                        key = f"{username}:otp"
-                        otp = generate_otp()
+                        # key = f"{username}:otp"
+                        # otp = generate_otp()
 
-                        pipe.set(key, otp, 600)
+                        # pipe.set(key, otp, 600)
 
-                        pipe.execute()
+                        # pipe.execute()
 
                         # save user to database
                         with session:
@@ -73,8 +71,8 @@ class AuthService:
                             )
 
                             try:
-                                db.add(user)
-                                db.commit()
+                                session.add(user)
+                                session.commit()
 
                                 cls.save_audit_log(
                                     cls.__user_username,
@@ -88,11 +86,11 @@ class AuthService:
 
                                 return {
                                     "status" : True,
-                                    "message" : "OTP sent successfully.",
+                                    "message" : "Account create succesfull",
                                     "role" : role
                                 }
                             except:
-                                db.rollback()
+                                session.rollback()
                                 cls.save_audit_log(
                                     cls.__user_username,
                                     "Register",
@@ -115,17 +113,6 @@ class AuthService:
                             "Failed"
                         )
                         raise RedisConnectionError("Redis is not connected")
-                else:
-                    cls.save_audit_log(
-                        cls.__user_username,
-                        "Register",
-                        "123.1.1.1",
-                        "Unable to set session token",
-                        None,
-                        "User",
-                        "Failed"
-                    )
-                    raise TokenSetUnsuccesfull("Unable to set session token")
             else:
                 cls.save_audit_log(
                     cls.__user_username,
@@ -307,10 +294,8 @@ class AuthService:
         cls,
         username : str
     ):
-        user_email = cls.get_email_by_username(username)
-
-        if user_email is not None:
-            otp = generate_otp()
+        if username is not None:
+            otp = generate_token()
             user_key = f"{username}:otp"
 
             redis_conn.set(user_key, otp, 600)
@@ -473,22 +458,6 @@ class AuthService:
             if userid:
                 return userid
             
-    @classmethod
-    def create_otp(
-        cls,
-        username : str,
-    ):
-        try:
-            key = f"{username}:otp"
-            otp = generate_otp()
-
-            redis_conn.set(key, otp, 600)
-
-            return True
-        except redis.ConnectionError as e:
-            print(e)
-            return False
-    
     @classmethod
     def forget_password(
         cls,

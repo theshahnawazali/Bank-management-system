@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from backend.app.schemas.account import UserUpdateBalance, AccountStatus
+from backend.app.schemas.account import UserUpdateBalance, AccountStatus, Transfer
 from backend.app.services.bank_service import BankService
 
 router = APIRouter()
@@ -7,6 +7,7 @@ router = APIRouter()
 #                 BANKING
 # ================================================
 @router.post('/transactions/deposit',summary="Deposit amount",tags=['Banking'])
+
 async def deposit(
     data : UserUpdateBalance
 ):
@@ -29,8 +30,8 @@ async def deposit(
     return res
 
 @router.post('/transactions/transfer',summary="Transfer amount",tags=['Banking'])
-async def deposit(
-    data : UserUpdateBalance
+async def transfer(
+    data : Transfer
 ):
     res = BankService.withdraw(
         data.sender_account_number,

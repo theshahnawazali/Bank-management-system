@@ -559,7 +559,7 @@ class BankService:
         account_number : int,
         amount : float
     ):
-        with db:
+        with SessionLocal() as db:
             user = db.scalar(
                 select(Account).where(Account.account_number == account_number)
             )
@@ -577,8 +577,10 @@ class BankService:
                     "Account",
                     "Success"
                 )
+                balance = user.balance
 
-                return user.balance
+                db.close()
+                return balance
             else:
                 AuthService.save_audit_log(
                     cls.get_username_by_account_number(account_number),
@@ -597,7 +599,7 @@ class BankService:
         account_number : int,
         amount : float
     ):
-        with db:
+        with SessionLocal() as db:
             user = db.scalar(
                 select(Account).where(Account.account_number == account_number)
             )
@@ -615,8 +617,11 @@ class BankService:
                     "Account",
                     "Success"
                 )
+                balance = user.balance
 
-                return user.balance
+                db.close()
+
+                return balance
             else:
                 AuthService.save_audit_log(
                     cls.get_username_by_account_number(account_number),
@@ -636,7 +641,7 @@ class BankService:
         receiver_account_number : int,
         amount : float
     ):
-        with db:
+        with SessionLocal() as db:
             sender = db.scalar(
                 select(Account).where(Account.account_number == sender_account_number)
             )
@@ -659,7 +664,11 @@ class BankService:
                         "Account",
                         "Success"
                     )
-                    return sender.balance
+                    balance = sender.balance
+
+                    db.close()
+
+                    return balance
                 else:
                     AuthService.save_audit_log(
                         cls.get_username_by_account_number(sender_account_number),
